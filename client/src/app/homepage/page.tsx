@@ -9,7 +9,6 @@ export default function Homepage() {
       <Heropage/>
       <Landingpage/>
       <Footer/>
-      <div>hellow</div>
     </>
   );
 }    

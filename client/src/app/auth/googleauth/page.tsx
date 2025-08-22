@@ -1,6 +1,8 @@
+
+"use client"
 import { getGoogleAuthURL } from "@/services/auth";
 
-export const LoginButton = () => {
+export  default function LoginButton () {
   const handleLogin = () => {
     window.location.href = getGoogleAuthURL();
   };
@@ -10,7 +12,7 @@ export const LoginButton = () => {
       <div className="w-full max-w-md">
         {/* Main Card */}
         <div className="bg-gray-900/80 backdrop-blur-sm border border-gray-800 rounded-3xl shadow-2xl p-6 sm:p-8 space-y-6 hover:shadow-blue-500/20 transition-all duration-300">
-          
+           
           {/* Logo Section */}
           <div className="text-center space-y-3">
             <div className="relative inline-block">

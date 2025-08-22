@@ -43,7 +43,7 @@ export default function Navbar () {
   ];
 
   const handlelogin = () => {
-    router.push("/googleauthlogin"); 
+    router.push("/auth/googleauth"); 
   };
 
   const handleLogout = () => {
