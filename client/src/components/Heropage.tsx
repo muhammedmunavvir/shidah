@@ -36,7 +36,7 @@ export default function Heropage() {
     </Badge>
 
     {/* Main Heading */}
-    <h1 className="text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black mb-6 leading-none">
+    <h1 className="text-6xl md:text-2xl lg:text-2xl xl:text-6xl font-black mb-6 leading-none">
       <span className="block bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-2">
         Welcome to
       </span>

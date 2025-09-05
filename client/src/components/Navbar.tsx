@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 // import { useAuthStore } from "@/store/useAuthStore";
 import { useAuthStore } from "@/store/useAuthstore";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 export default function Navbar () {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
@@ -35,7 +36,7 @@ export default function Navbar () {
   }, []);
   
   const navigationItems = [
-    { name: "Products", href: "#" },
+    { name: "Products", href: "/allproducts" },
     { name: "Categories", href: "#" },
     { name: "Deals", href: "#" },
     { name: "About", href: "#" },
@@ -87,7 +88,7 @@ export default function Navbar () {
           }`}>
             <div className="flex items-center space-x-6">
               {navigationItems.map((item) => (
-                <a
+                <Link
                   key={item.name}
                   href={item.href}
                   className={`font-medium text-fuchsia-400 hover:text-white relative group ${
@@ -96,7 +97,7 @@ export default function Navbar () {
                 >
                   {item.name}
                   <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300"></span>
-                </a>
+                </Link>
               ))}
             </div>
           </div>

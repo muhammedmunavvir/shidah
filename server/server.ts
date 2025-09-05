@@ -6,6 +6,7 @@ import productRouter from "./src/routes/productroute.js";
 import passport from "passport";
 import "./src/config/passport.js"; // initialize Google strategy
 import authrouter from "./src/routes/auth.route.js";
+import cartrouter from "./src/routes/cartroute.js";
 
 dotenv.config();
 connectDB();     
@@ -20,6 +21,7 @@ app.use(passport.initialize());
 // Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/auth", authrouter);
+app.use("/api/v1/cart",cartrouter)
 
 // Default route
 app.get("/", (req, res) => {
@@ -30,4 +32,5 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT_NUMBER || 5002;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-});
+});    
+           

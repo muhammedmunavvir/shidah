@@ -20,12 +20,12 @@
     "express": "^5.1.0",
     "express-session": "^1.18.2",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.1",
+    "mongoose": "^8.18.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0"
   },
   "scripts": {
-    "dev": "node --loader ts-node/esm server.ts",
+    "dev": "nodemon --watch . --ext ts,js --exec \"node --loader ts-node/esm ./server.ts\"",
     "start": "node dist/server.js"
   }
 }

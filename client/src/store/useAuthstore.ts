@@ -10,7 +10,7 @@ interface AuthState {
 }
 
 interface DecodedToken {
-  id: string;
+  _id: string;
   email: string;
   role: string;
   iat: number;
@@ -23,7 +23,7 @@ let storedUser = null;
 if (storedToken) {
   try {
     const decoded: DecodedToken = jwtDecode(storedToken);
-    storedUser = { id: decoded.id, email: decoded.email, role: decoded.role };
+    storedUser = { id: decoded._id, email: decoded.email, role: decoded.role };
   } catch (err) {
     console.error("Invalid token in localStorage", err);
     localStorage.removeItem("authToken");
@@ -36,7 +36,7 @@ export const useAuthStore = create<AuthState>((set) => ({
   setToken: (token) => {
     localStorage.setItem("authToken", token);
     const decoded: DecodedToken = jwtDecode(token);
-    set({ token, user: { id: decoded.id, email: decoded.email, role: decoded.role } });
+    set({ token, user: { id: decoded._id, email: decoded.email, role: decoded.role } });
   },
   setUser: (user) => set({ user }),
   logout: () => {
