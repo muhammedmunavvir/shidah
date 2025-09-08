@@ -43,39 +43,3 @@ export const fetchsingleproduct = async (
   }
 };
 
-export const addtocart = async (req: Request, res: Response): Promise<void> => {
-  console.log(req.body);
-  try {
-    const { productId, qty, userId } = req.body;
-    if (!userId || !productId) {
-      res.status(400).json({ message: "userId and productId are required" });
-      return;
-    }
-
-    let cart = await CartModel.findOne({ userId });
-
-    if (!cart) {
-      cart = new CartModel({
-        userId,
-        items: [{ productId, qty: qty || 1 }],
-      });
-    } else {
-      const itemIndex = cart.items.findIndex(
-        (item) => item.productId.toString() === productId
-      );
-
-      if (itemIndex > -1) {
-        console.log("item already in your cart");
-      } else {
-        cart.items.push({ productId, qty: qty || 1 });
-      }
-    }
-
-    await cart.save();
-
-    res.status(201).json({ message: "Added to cart", cart });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Failed to add to cart" });
-  }
-};

@@ -28,6 +28,7 @@ app.get("/", (req, res) => {
   res.send("API is running");
 }); 
 
+
 // Start server
 const PORT = process.env.PORT_NUMBER || 5002;
 app.listen(PORT, () => {

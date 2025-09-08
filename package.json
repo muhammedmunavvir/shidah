@@ -4,9 +4,9 @@
   "devDependencies": {
     "concurrently": "^9.2.0"
   },
-  "scripts": {
-    "client": "npm run dev --prefix client",
-    "server": "npm run dev --prefix server",
-    "dev": "concurrently \"npm run server\" \"npm run client\""
+   "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "npm run start:dev --prefix server",
+    "client": "npm run dev --prefix client"
   }
 }
