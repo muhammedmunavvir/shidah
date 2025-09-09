@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { addToCart } from "@/api/cartapi";
+import { addToCart, getusercartapi } from "@/api/cartapi";
 import { CartItem } from "@/types/cart";
 import { toast } from "sonner";
 
@@ -7,6 +7,7 @@ interface CartState {
   items: CartItem[];
   addItem: (item: CartItem) => Promise<void>;
   setCart: (items: CartItem[]) => void;
+  Getitem: () => Promise<void>;
 }
 
 export const useCartStore = create<CartState>((set) => ({
@@ -15,8 +16,8 @@ export const useCartStore = create<CartState>((set) => ({
   addItem: async (item) => {
     try {
       const res = await addToCart({
-        productId: item.productId,
-        qty: item.qty,
+        productId:typeof item.productId === "string" ? item.productId : item.productId?._id,
+        qty: item.qty,  
         userId: item.userId,
       });
 
@@ -40,4 +41,16 @@ export const useCartStore = create<CartState>((set) => ({
   },
 
   setCart: (items) => set({ items }),
+
+  Getitem: async () => {
+    try {
+      const res = await getusercartapi();
+     if (res?.data?.length > 0) {
+      set({ items: res.data[0].items }); 
+    }
+      console.log("store cart fetch:", res);
+    } catch (error) {
+      console.error("Failed to fetch cart:", error);
+    }
+  },
 }));

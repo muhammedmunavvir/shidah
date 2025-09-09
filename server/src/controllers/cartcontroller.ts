@@ -2,12 +2,26 @@ import { Request, Response } from "express";
 import { CartModel } from "../models/cartmodel.js";
 import { Types } from "mongoose";
 
+export const Getcartcontroller = async (req: Request, res: Response) => {
+  const { userId } = req.params;
+  try {
+    const usercart = await CartModel.find( {userId} ).populate("items.productId");
+    return res
+      .status(200)
+      .json({ status: "success", message: "Got user cart", data: usercart });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const addtocart = async (req: Request, res: Response) => {
   try {
     const { productId, qty, userId } = req.body;
 
     if (!userId || !productId) {
-      return res.status(400).json({ message: "userId and productId are required" });
+      return res
+        .status(400)
+        .json({ message: "userId and productId are required" });
     }
 
     if (!Types.ObjectId.isValid(productId)) {
@@ -29,7 +43,9 @@ export const addtocart = async (req: Request, res: Response) => {
       );
 
       if (itemIndex > -1) {
-        return res.status(200).json({ message: "Item already in your cart", cart });
+        return res
+          .status(200)
+          .json({ message: "Item already in your cart", cart });
       }
 
       cart.items.push({ productId: productObjectId, qty: qty || 1 });

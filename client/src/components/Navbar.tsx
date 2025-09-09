@@ -11,22 +11,29 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-// import { useAuthStore } from "@/store/useAuthStore";
 import { useAuthStore } from "@/store/useAuthstore";
+import { useCartStore } from "@/store/userCartstore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 export default function Navbar () {
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const { items, Getitem } = useCartStore();
+
   const logout = useAuthStore((state) => state.logout);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
+  // Fetch cart when Navbar mounts
+  useEffect(() => {
+    Getitem();
+  }, [Getitem]);
+
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 50) {
         setIsScrolled(true);
-        setIsSearchOpen(false); // Close search when scrolling
+        setIsSearchOpen(false); 
       } else {
         setIsScrolled(false);
       }
@@ -149,12 +156,13 @@ export default function Navbar () {
             )}
 
             {/* Cart */}
-            <Button
+            {user?<Button
               variant="ghost"
               size="icon"
               className={`relative hover:bg-white/10 ${
                 isScrolled ? 'h-8 w-8' : 'h-10 w-10'
               }`}
+              onClick={()=>router.push("/usercart")}
             >
               <ShoppingCart className={`text-white ${
                 isScrolled ? 'h-4 w-4' : 'h-5 w-5'
@@ -164,9 +172,9 @@ export default function Navbar () {
                   ? '-top-1 -right-1 h-3 w-3 text-[8px]' 
                   : '-top-1 -right-1 h-4 w-4 text-[10px]'
               }`}>
-                2
+                {items.length}
               </span>
-            </Button>
+            </Button>:null}
 
             {/* User Menu */}
             {user ? (

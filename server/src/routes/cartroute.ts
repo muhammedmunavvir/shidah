@@ -1,8 +1,8 @@
-import  express  from "express";
-import { addtocart } from "../controllers/cartcontroller.js";
+import express from "express";
+import { addtocart, Getcartcontroller } from "../controllers/cartcontroller.js";
 
-const cartrouter=express.Router()
+const cartrouter = express.Router();
+cartrouter.get("/getusercart/:userId", Getcartcontroller);
+cartrouter.post("/addtocart", addtocart);
 
-cartrouter.post("/addtocart",addtocart)
- 
-export default cartrouter
+export default cartrouter;
