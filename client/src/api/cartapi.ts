@@ -18,12 +18,41 @@ export const addToCart = async (body: AddToCartBody) => {
 };
 
 export const getusercartapi = async () => {
- const { user } = useAuthStore.getState();
+  const { user } = useAuthStore.getState();
   const userId = user?.id;
   try {
     const response = await api.get(`/cart/getusercart/${userId}`);
     return response.data;
   } catch (error) {
     console.log(error);
+  }
+};
+export const removeitemapi = async (productId: any) => {
+  const { user } = useAuthStore.getState();
+  const userId = user?.id;
+  try {
+    const response = await api.delete(
+      `/cart/removecartitem/${userId}/${productId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const updateQuantityApi = async (payload: {
+  productId: string;
+  qty: number;
+}) => {
+  const { user } = useAuthStore.getState();
+  const userId = user?.id;
+  try {
+    const response = await api.put(`/cart/update-quantity`, {
+      userId,
+      productId: payload.productId,
+      qty: payload.qty,
+    });
+    return response.data;
+  } catch (error) {
+    console.log(error); 
   }
 };

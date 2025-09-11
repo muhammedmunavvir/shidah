@@ -26,7 +26,6 @@ export const fetchsingleproduct = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log(req.params, "params ");
     const { id } = req.params;
     const product = await ProductModel.findById(id);
     res.status(200).json({
