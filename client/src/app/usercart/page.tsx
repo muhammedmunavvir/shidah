@@ -52,14 +52,15 @@ export default function Usercart() {
   };
 
   const handleRemoveItem = (item: CartItem) => {
-    const productId = getProductId(item.productId);
+    const productId = getProductId(item.productId!);
     removeItem(productId);
   };
 
   if (isLoading) {
     return (
       <>
-        <Navbar />
+        <Navbar
+        />
         <div className="container mx-auto p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-48"></div>
@@ -129,7 +130,7 @@ export default function Usercart() {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item: CartItem) => {
               const product = item.productId as Product;
-              const productId = getProductId(item.productId);
+              const productId = getProductId(item.productId!);
 
               return (
                 <Card key={item._id} className="overflow-hidden">
@@ -269,10 +270,12 @@ export default function Usercart() {
                   </span>
                 </div>
 
-                <Button className="w-full h-12 text-base font-semibold">
-                  <CreditCard className="w-5 h-5 mr-2" />
-                  Proceed to Checkout
-                </Button>
+               <Button asChild className="w-full h-12 text-base font-semibold">
+  <Link href="/checkout-page">
+    <CreditCard className="w-5 h-5 mr-2" />
+    Proceed to Checkout
+  </Link>
+</Button>
 
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">
