@@ -6,6 +6,7 @@ import {
   updateQuantityApi,
 } from "@/api/cartapi";
 import { CartItem } from "@/types/cart";
+import { Product } from "@/types/product";
 import { toast } from "sonner";
 
 interface CartState {
@@ -14,13 +15,13 @@ interface CartState {
   setCart: (items: CartItem[]) => void;
   Getitem: () => Promise<void>;
   removeItem: (productId: string) => Promise<void>;
-  updateQuantity: (productId: string, newQty: number) => Promise<void>; //
+  updateQuantity: (productId: string, newQty: number) => Promise<void>;
 }
 
-export const useCartStore = create<CartState>((set) => ({
+export const useCartStore = create<CartState>((set, get) => ({
   items: [],
 
-  addItem: async (item) => {
+  addItem: async (item: CartItem) => {
     try {
       const res = await addToCart({
         productId:
@@ -31,16 +32,13 @@ export const useCartStore = create<CartState>((set) => ({
         userId: item.userId,
       });
 
-
       if (res?.message?.toLowerCase().includes("already")) {
         toast.info(res.message);
         return;
       }
 
       if (res?.message?.toLowerCase().includes("added")) {
-        set(() => ({
-          items: res.cart.items, // use backend cart
-        }));
+        set({ items: res.cart.items });
         toast.success(res.message);
       }
     } catch (err) {
@@ -49,7 +47,7 @@ export const useCartStore = create<CartState>((set) => ({
     }
   },
 
-  setCart: (items) => set({ items }),
+  setCart: (items: CartItem[]) => set({ items }),
 
   Getitem: async () => {
     try {
@@ -61,17 +59,17 @@ export const useCartStore = create<CartState>((set) => ({
       console.error("Failed to fetch cart:", error);
     }
   },
+
   removeItem: async (productId: string) => {
     try {
-      await removeitemapi(productId); // call backend API
+      await removeitemapi(productId);
 
-      // Update the store to remove the item
       set((state) => ({
         items: state.items.filter((item) => {
           const id =
             typeof item.productId === "string"
               ? item.productId
-              : item.productId?._id; // get the actual product id
+              : item.productId?._id;
           return id !== productId;
         }),
       }));
@@ -84,41 +82,36 @@ export const useCartStore = create<CartState>((set) => ({
   },
 
   updateQuantity: async (productId: string, newQty: number) => {
-    
-    set((state) => ({
-      items: state.items.map((item) => {
+    const items = get().items;
+    set({
+      items: items.map((item) => {
         const id =
           typeof item.productId === "string"
             ? item.productId
             : item.productId?._id;
         return id === productId ? { ...item, qty: newQty } : item;
       }),
-    }));
+    });
 
     try {
       const res = await updateQuantityApi({ productId, qty: newQty });
 
-      if (!res?.success) {
-        throw new Error(res?.message || "Update failed");
-      }
-
+      if (!res?.success) throw new Error(res?.message || "Update failed");
       toast.success("Quantity updated");
     } catch (error) {
       console.error("Failed to update quantity:", error);
       toast.error("Failed to update quantity");
 
       // Rollback if API fails
-      set((state) => ({
-        items: state.items.map((item) => {
+      set({
+        items: get().items.map((item) => {
           const id =
             typeof item.productId === "string"
               ? item.productId
               : item.productId?._id;
-          return id === productId
-            ? { ...item, qty: item.qty || 1 } // restore
-            : item;
+          return id === productId ? { ...item, qty: item.qty || 1 } : item;
         }),
-      }));
+      });
     }
   },
 }));

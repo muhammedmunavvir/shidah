@@ -279,7 +279,7 @@ export default function Usercart() {
 
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">
-                    Secure checkout powered by Stripe
+                    Secure checkout powered by Razor Pay
                   </p>
                 </div>
               </CardContent>
