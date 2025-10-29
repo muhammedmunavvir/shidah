@@ -34,11 +34,12 @@ export default function Usercart() {
     };
     loadCart();
   }, [Getitem]);
-
+console.log(items,"iiii")
   const calculateTotal = () => {
     return items.reduce(
       (sum, item) =>
-        sum + ((item.productId as Product)?.price || 0) * (item.qty || 1),
+        sum +
+        ((item.productId as Product)?.discountPrice || 0) * (item.qty || 1),
       0
     );
   };
@@ -59,8 +60,7 @@ export default function Usercart() {
   if (isLoading) {
     return (
       <>
-        <Navbar
-        />
+        <Navbar />
         <div className="container mx-auto p-6">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-muted rounded w-48"></div>
@@ -216,12 +216,12 @@ export default function Usercart() {
                           {/* Price */}
                           <div className="text-right">
                             <p className="text-sm text-muted-foreground">
-                              ₹{product?.price} × {item.qty}
+                              ₹{product?.discountPrice} × {item.qty}
                             </p>
                             <p className="font-bold text-lg">
                               ₹
                               {(
-                                (product?.price || 0) * (item.qty || 1)
+                                (product?.discountPrice || 0) * (item.qty || 1)
                               ).toLocaleString()}
                             </p>
                           </div>
@@ -253,12 +253,12 @@ export default function Usercart() {
                     <span>Shipping</span>
                     <span className="text-green-600">Free</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  {/* <div className="flex justify-between text-sm">
                     <span>Tax</span>
                     <span>
                       ₹{Math.round(calculateTotal() * 0.18).toLocaleString()}
                     </span>
-                  </div>
+                  </div> */}
                 </div>
 
                 <Separator />
@@ -266,16 +266,17 @@ export default function Usercart() {
                 <div className="flex justify-between items-center text-lg font-bold">
                   <span>Total</span>
                   <span>
-                    ₹{Math.round(calculateTotal() * 1.18).toLocaleString()}
+                    {/* ₹{Math.round(calculateTotal() * 1.18).toLocaleString()} */}
+                    ₹{Math.round(calculateTotal() ).toLocaleString()}
                   </span>
                 </div>
 
-               <Button asChild className="w-full h-12 text-base font-semibold">
-  <Link href="/checkout-page">
-    <CreditCard className="w-5 h-5 mr-2" />
-    Proceed to Checkout
-  </Link>
-</Button>
+                <Button asChild className="w-full h-12 text-base font-semibold">
+                  <Link href="/checkout-page">
+                    <CreditCard className="w-5 h-5 mr-2" />
+                    Proceed to Checkout
+                  </Link>
+                </Button>
 
                 <div className="text-center">
                   <p className="text-xs text-muted-foreground">

@@ -7,6 +7,7 @@ import passport from "passport";
 import "./src/config/passport.js"; // initialize Google strategy
 import authrouter from "./src/routes/auth.route.js";
 import cartrouter from "./src/routes/cartroute.js";
+import Ordercreationroute from "./src/routes/OrderCreation.route.js";
 
 dotenv.config();
 connectDB();     
@@ -17,11 +18,12 @@ const app = express();
 app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(passport.initialize());  
-  
+   
 // Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/auth", authrouter);
 app.use("/api/v1/cart",cartrouter)
+app.use("/api/v1/order",Ordercreationroute)
 
 // Default route
 app.get("/", (req, res) => {

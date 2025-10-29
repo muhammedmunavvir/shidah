@@ -1,13 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
-import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
@@ -15,55 +14,43 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CreditCard, Lock, Shield, Star, Truck, ArrowLeft } from "lucide-react";
+import { Lock, Shield, Star, Truck, ArrowLeft } from "lucide-react";
 import { indianStates } from "@/constants/IndianStates";
 import { useCartStore } from "@/store/userCartstore";
-import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
-
-// Mock data for demonstration
-const orderItems = [
-  {
-    id: 1,
-    name: "Premium Wireless Headphones",
-    price: 299.99,
-    quantity: 1,
-    image: "/wireless-headphones.png",
-  },
-  {
-    id: 2,
-    name: "Bluetooth Speaker",
-    price: 149.99,
-    quantity: 2,
-    image: "/bluetooth-speaker.png",
-  },
-  {
-    id: 3,
-    name: "USB-C Cable",
-    price: 24.99,
-    quantity: 1,
-    image: "/usb-cable.png",
-  },
-];
-
-const subtotal = orderItems.reduce(
-  (sum, item) => sum + item.price * item.quantity,
-  0
-);
-const shipping = 9.99;
-const tax = subtotal * 0.08;
-const total = subtotal + shipping + tax;
+import { useMutation } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { createOrderApi } from "@/api/CreateOrderapi";
+import { useRouter } from "next/navigation";
+import { openRazorpay } from "../RazorpayChekout/Razorpaychekout";
 
 export default function CheckoutPage() {
-   const {Getitem } =useCartStore()
-  const [paymentMethod, setPaymentMethod] = useState("card");
-  const [savePayment, setSavePayment] = useState(false);
+  const router = useRouter();
+  const { items, Getitem } = useCartStore();
+
+  useEffect(() => {
+    Getitem(); // Fetch real cart data from backend when page loads
+  }, [Getitem]);
+
+  // Calculate totals using real product data
+  const subtotal = items.reduce((sum, item) => {
+    const product = item.productId as Product;
+    const price = product?.discountPrice || product?.price || 0;
+    return sum + price * (item.qty || 1);
+  }, 0);
+
+  const shipping = items.length > 0 ? 0 : 0; // e.g., ₹49 shipping if not empty
+  const tax = subtotal * 0.05; // 5% GST
+  const total = subtotal + shipping + tax;
+
+  // Form states
   const [UserContactInformation, setUserContactInformation] = useState({
     FirstName: "",
     LastName: "",
     EmailAddress: "",
     PhoneNumber: "",
   });
+
   const [UserShippingAddress, setUserShippingAddress] = useState({
     StreetAddress: "",
     Appartment: "",
@@ -72,27 +59,67 @@ export default function CheckoutPage() {
     PinCode: "",
   });
 
-  const HandleContactInformation = (e: any) => {
+  const HandleContactInformation = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log(e.target.value);
-    setUserContactInformation((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserContactInformation((prev) => ({ ...prev, [name]: value }));
   };
 
   const HandleShippingAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUserShippingAddress((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setUserShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
- const { items } = useCartStore();
-const subtotal = items.reduce(
-  (sum, item) => sum + ((item.productId as Product)?.price || 0) * (item.qty || 1),
-  0
-);
+ const { mutate: completeOrder, isPending } = useMutation({
+  mutationFn: createOrderApi,
+  onSuccess: (data) => {
+    console.log(data, "data");
+    toast.success("Order created successfully!");
+
+    // Open Razorpay checkout using the response
+    openRazorpay({
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, // from .env
+      orderId: data.order.id, // Razorpay order ID
+      amount: data.order.amount, // Amount in paise
+      currency: data.order.currency,
+      name: "ClickStore",
+      description: "Secure payment with Razorpay",
+      prefill: {
+        name: `${UserContactInformation.FirstName} ${UserContactInformation.LastName}`,
+        email: UserContactInformation.EmailAddress,
+        contact: UserContactInformation.PhoneNumber,
+      },
+      notes: {
+        dbOrderId: data.dbOrderId, // pass MongoDB order reference
+      },
+      onSuccess: (paymentResponse: any) => {
+        router.push(`/order-confirmation/${data.dbOrderId}`);
+      },
+      onFailure: () => {
+        toast.error("Payment failed. Please try again!");
+      },
+    });
+  },
+  onError: (error: any) => {
+    toast.error(error?.response?.data?.message || "Something went wrong!");
+  },
+});
+
+
+  const handleCompleteOrder = () => {
+    if (items.length === 0) {
+      toast.error("Your cart is empty!");
+      return;
+    }
+
+    const orderData = {
+      contact: UserContactInformation,
+      shipping: UserShippingAddress,
+      items,
+      amount: subtotal,
+    };
+
+    completeOrder(orderData);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
@@ -222,7 +249,7 @@ const subtotal = items.reduce(
                     <Label htmlFor="state">State</Label>
                     <Select
                       value={UserShippingAddress.State}
-                      onValueChange={(val:any) =>
+                      onValueChange={(val: any) =>
                         setUserShippingAddress((prev) => ({
                           ...prev,
                           State: val,
@@ -259,46 +286,57 @@ const subtotal = items.reduce(
 
           {/* Right Column - Order Summary */}
           <div className="space-y-6">
-            {/* Order Summary */}
             <Card className="sticky top-8">
               <CardHeader>
                 <CardTitle>Order Summary</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {/* Order Items */}
+                {/* Real Order Items */}
                 <div className="space-y-4">
-                  {orderItems.map((item) => (
-                    <div key={item.id} className="flex items-center gap-4">
-                      <div className="relative">
-                        <img
-                          src={item.image || "/placeholder.svg"}
-                          alt={item.name}
-                          className="w-16 h-16 object-cover rounded-md border"
-                        />
-                        {item.quantity > 1 && (
-                          <Badge
-                            variant="secondary"
-                            className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                          >
-                            {item.quantity}
-                          </Badge>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium text-sm text-pretty">
-                          {item.name}
-                        </h4>
-                        <p className="text-sm text-muted-foreground">
-                          Qty: {item.quantity}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-medium">
-                          ${(item.price * item.quantity).toFixed(2)}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                  {items.length === 0 ? (
+                    <p className="text-muted-foreground text-sm">
+                      Your cart is empty.
+                    </p>
+                  ) : (
+                    items.map((item) => {
+                      const product = item.productId as Product;
+                      const price =
+                        product?.discountPrice || product?.price || 0;
+                      const image = product?.images?.[0] || "/placeholder.svg";
+                      return (
+                        <div key={item._id} className="flex items-center gap-4">
+                          <div className="relative">
+                            <img
+                              src={image}
+                              alt={product?.name}
+                              className="w-16 h-16 object-cover rounded-md border"
+                            />
+                            {item?.qty > 1 && (
+                              <Badge
+                                variant="secondary"
+                                className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                              >
+                                {item.qty}
+                              </Badge>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm text-pretty">
+                              {product?.name}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              Qty: {item.qty}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">
+                              ₹{(price * (item.qty || 1)).toFixed(2)}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
 
                 <Separator />
@@ -307,23 +345,23 @@ const subtotal = items.reduce(
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal</span>
-                    <span>${subtotal.toFixed(2)}</span>
+                    <span>₹{subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="flex items-center gap-1">
                       <Truck className="h-3 w-3" />
                       Shipping
                     </span>
-                    <span>${shipping.toFixed(2)}</span>
+                    <span>₹{shipping.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
+                  {/* <div className="flex justify-between text-sm">
                     <span>Tax</span>
-                    <span>${tax.toFixed(2)}</span>
-                  </div>
+                    <span>₹{tax.toFixed(2)}</span>
+                  </div> */}
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
-                    <span>${total.toFixed(2)}</span>
+                    <span>₹{subtotal.toFixed(2)}</span>
                   </div>
                 </div>
 
@@ -331,9 +369,13 @@ const subtotal = items.reduce(
                 <Button
                   className="w-full h-12 text-base font-semibold"
                   size="lg"
+                  onClick={handleCompleteOrder}
+                  disabled={isPending}
                 >
                   <Lock className="mr-2 h-4 w-4" />
-                  Complete Order - ${total.toFixed(2)}
+                  {isPending
+                    ? "Processing..."
+                    : `Complete Order - ₹${subtotal.toFixed(2)}`}
                 </Button>
 
                 {/* Trust Indicators */}
