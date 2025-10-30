@@ -3,6 +3,8 @@ import crypto from "crypto";
 import { Request, Response } from "express";
 import ProductModel from "../models/product";
 import { OrderModel } from "../models/OrderModel";
+import { CartModel } from "../models/cartmodel";
+import mongoose from "mongoose";
 
 export const createOrder = async (req: Request, res: Response) => {
   try {
@@ -13,7 +15,7 @@ export const createOrder = async (req: Request, res: Response) => {
         .status(400)
         .json({ success: false, message: "Incomplete order data" });
 
-    // ✅ 1. Fetch product details from DB to ensure valid data
+    //  Fetch product details from DB to ensure valid data
     const formattedItems = await Promise.all(
       items.map(async (item: any) => {
         const product = await ProductModel.findById(item.productId);
@@ -37,9 +39,9 @@ export const createOrder = async (req: Request, res: Response) => {
     // const shippingCharge = subtotal > 1000 ? 0 : 49; // free shipping rule
     // const tax = subtotal * 0.05; // 5% GST
     //  const total = subtotal + shippingCharge + tax;
-    const shippingCharge = 0;// free shipping rule
-    const tax =0 // 5% GST
-    const total = subtotal 
+    const shippingCharge = 0; // free shipping rule
+    const tax = 0; // 5% GST
+    const total = subtotal;
 
     const razorpay = new Razorpay({
       key_id: process.env.RAZOR_PAY_KEY_ID!,
@@ -67,7 +69,6 @@ export const createOrder = async (req: Request, res: Response) => {
       total,
     });
 
-    
     res.status(200).json({
       success: true,
       message: "Order created successfully",
@@ -81,7 +82,6 @@ export const createOrder = async (req: Request, res: Response) => {
 };
 
 export const verifyPayment = async (req: Request, res: Response) => {
-
   try {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
       req.body;
@@ -92,16 +92,25 @@ export const verifyPayment = async (req: Request, res: Response) => {
       .update(body)
       .digest("hex");
 
-
     if (expectedSignature === razorpay_signature) {
-      await OrderModel.findOneAndUpdate(
+      const order = await OrderModel.findOneAndUpdate(
         { razorpayOrderId: razorpay_order_id },
-        { status: "paid", razorpayPaymentId: razorpay_payment_id }
+        { status: "paid", razorpayPaymentId: razorpay_payment_id },
+        { new: true }
       );
+      console.log("🧾 order.userInfo.userId =", order?.userInfo?.userId);
 
-      return res
-        .status(200)
-        .json({ success: true, message: "Payment verified" });
+      if (order?.userInfo?.userId) {
+        const userObjectId = new mongoose.Types.ObjectId(order.userInfo.userId);
+        const deletedCart = await CartModel.findOneAndDelete({
+          userId: userObjectId,
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Payment verified and cart cleared",
+      });
     }
 
     res.status(400).json({ success: false, message: "Invalid signature" });

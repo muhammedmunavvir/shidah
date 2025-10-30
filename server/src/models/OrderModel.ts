@@ -21,6 +21,7 @@ interface Order extends Document {
   shippingCharge: number;
   tax: number;
   total: number;
+  userId:string;
 }
 
 const OrderSchema = new Schema<Order>(
@@ -31,6 +32,7 @@ const OrderSchema = new Schema<Order>(
     currency: { type: String, default: "INR" },
     status: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
     userInfo: { type: Object, required: true },
+    //userId: { type: String, required: true },
     shippingAddress: { type: Object, required: true },
     orderItems: [
       {

@@ -2,7 +2,7 @@
 
 import { verifyPaymentApi } from "@/api/CreateOrderapi";
 import { toast } from "sonner";
-
+import { useRouter } from "next/router";
 interface RazorpayOptions {
   key: string;
   orderId: string; // Razorpay order id (from backend)
@@ -18,6 +18,7 @@ interface RazorpayOptions {
 }
 
 export const openRazorpay = (options: RazorpayOptions) => {
+  //const router=useRouter()
   if (typeof window === "undefined") return;
 
   const razorpayOptions = {
@@ -30,8 +31,6 @@ export const openRazorpay = (options: RazorpayOptions) => {
     prefill: options.prefill,
     theme: { color: "#2563EB" },
     handler: async function (response: any) {
-      console.log("💳 Payment Response:", response);
-
       try {
         const result = await verifyPaymentApi({
           razorpay_order_id: response.razorpay_order_id,
@@ -41,14 +40,16 @@ export const openRazorpay = (options: RazorpayOptions) => {
         });
 
         if (result.success) {
-          toast.success("✅ Payment verified successfully!");
-          console.log("Verified Payment:", result);
+          toast.success(" Payment verified successfully!");
+          setTimeout(() => {
+            window.location.href = "/order-summary";
+          }, 1500);
         } else {
-          toast.error("❌ Payment verification failed");
+          toast.error(" Payment verification failed");
         }
       } catch (err) {
         console.error("Error verifying payment:", err);
-        toast.error("⚠️ Error verifying payment");
+        toast.error(" Error verifying payment");
       }
     },
     modal: {

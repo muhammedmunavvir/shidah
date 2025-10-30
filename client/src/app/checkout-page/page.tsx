@@ -23,10 +23,12 @@ import { toast } from "sonner";
 import { createOrderApi } from "@/api/CreateOrderapi";
 import { useRouter } from "next/navigation";
 import { openRazorpay } from "../RazorpayChekout/Razorpaychekout";
+import { useAuthStore } from "@/store/useAuthstore";
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, Getitem } = useCartStore();
+  const { user } = useAuthStore();
 
   useEffect(() => {
     Getitem(); // Fetch real cart data from backend when page loads
@@ -45,9 +47,10 @@ export default function CheckoutPage() {
 
   // Form states
   const [UserContactInformation, setUserContactInformation] = useState({
+    userId: user?.id || "",
     FirstName: "",
     LastName: "",
-    EmailAddress: "",
+    EmailAddress: user?.email || "",
     PhoneNumber: "",
   });
 
@@ -68,41 +71,39 @@ export default function CheckoutPage() {
     const { name, value } = e.target;
     setUserShippingAddress((prev) => ({ ...prev, [name]: value }));
   };
- const { mutate: completeOrder, isPending } = useMutation({
-  mutationFn: createOrderApi,
-  onSuccess: (data) => {
-    console.log(data, "data");
-    toast.success("Order created successfully!");
+  const { mutate: completeOrder, isPending } = useMutation({
+    mutationFn: createOrderApi,
+    onSuccess: (data) => {
+        toast.success("Order created successfully!");
 
-    // Open Razorpay checkout using the response
-    openRazorpay({
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, // from .env
-      orderId: data.order.id, // Razorpay order ID
-      amount: data.order.amount, // Amount in paise
-      currency: data.order.currency,
-      name: "ClickStore",
-      description: "Secure payment with Razorpay",
-      prefill: {
-        name: `${UserContactInformation.FirstName} ${UserContactInformation.LastName}`,
-        email: UserContactInformation.EmailAddress,
-        contact: UserContactInformation.PhoneNumber,
-      },
-      notes: {
-        dbOrderId: data.dbOrderId, // pass MongoDB order reference
-      },
-      onSuccess: (paymentResponse: any) => {
-        router.push(`/order-confirmation/${data.dbOrderId}`);
-      },
-      onFailure: () => {
-        toast.error("Payment failed. Please try again!");
-      },
-    });
-  },
-  onError: (error: any) => {
-    toast.error(error?.response?.data?.message || "Something went wrong!");
-  },
-});
-
+      // Open Razorpay checkout using the response
+      openRazorpay({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, // from .env
+        orderId: data.order.id, // Razorpay order ID
+        amount: data.order.amount, // Amount in paise
+        currency: data.order.currency,
+        name: "ClickStore",
+        description: "Secure payment with Razorpay",
+        prefill: {
+          name: `${UserContactInformation.FirstName} ${UserContactInformation.LastName}`,
+          email: UserContactInformation.EmailAddress,
+          contact: UserContactInformation.PhoneNumber,
+        },
+        notes: {
+          dbOrderId: data.dbOrderId, // pass MongoDB order reference
+        },
+        onSuccess: (paymentResponse: any) => {
+          router.push(`/order-confirmation/${data.dbOrderId}`);
+        },
+        onFailure: () => {
+          toast.error("Payment failed. Please try again!");
+        },
+      });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Something went wrong!");
+    },
+  });
 
   const handleCompleteOrder = () => {
     if (items.length === 0) {
@@ -180,11 +181,14 @@ export default function CheckoutPage() {
                     id="email"
                     type="email"
                     placeholder="john.doe@example.com"
-                    onChange={HandleContactInformation}
-                    name="EmailAddress"
-                    value={UserContactInformation.EmailAddress}
+                    value={user?.email || ""}
+                    disabled
                   />
+                  <p className="text-xs text-muted-foreground">
+                    This is your logged-in email
+                  </p>
                 </div>
+
                 <div>
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input
