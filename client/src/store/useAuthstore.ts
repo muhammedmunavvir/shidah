@@ -2,11 +2,18 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import { jwtDecode } from "jwt-decode";
 
+interface User {
+  id: string;
+  email: string;
+  role: string;
+  photo?: string;
+}
+
 interface AuthState {
   token: string | null;
-  user: { id: string; email: string; role: string } | null;
+  user: User | null;
   setToken: (token: string) => void;
-  setUser: (user: { id: string; email: string; role: string }) => void;
+  setUser: (user: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -16,6 +23,7 @@ interface DecodedToken {
   role: string;
   iat: number;
   exp: number;
+  avatar?: string;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -23,74 +31,37 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
+
       setToken: (token) => {
         try {
           const decoded: DecodedToken = jwtDecode(token);
           set({
             token,
-            user: { id: decoded._id, email: decoded.email, role: decoded.role },
+            user: {
+              id: decoded._id,
+              email: decoded.email,
+              role: decoded.role,
+              photo: decoded.avatar || "",
+            },
           });
         } catch (err) {
           console.error("Invalid token", err);
           set({ token: null, user: null });
         }
       },
-      setUser: (user) => set({ user }),
+
+      setUser: (user) =>
+        set((state) => ({
+          user: state.user
+            ? { ...state.user, ...user }
+            : (user as User), // safe cast, ensures correct type
+        })),
+
       logout: () => set({ token: null, user: null }),
     }),
     {
-      name: "authToken", 
+      name: "authToken",
       storage: createJSONStorage(() => localStorage),
     }
   )
 );
-
-
-
-// import { create } from "zustand";
-// import {jwtDecode} from "jwt-decode";
-
-// interface AuthState {
-//   token: string | null;
-//   user: { id: string; email: string; role: string } | null;
-//   setToken: (token: string) => void;
-//   setUser: (user: { id: string; email: string; role: string }) => void;
-//   logout: () => void;
-// }
-
-// interface DecodedToken {
-//   _id: string;
-//   email: string;
-//   role: string;
-//   iat: number;
-//   exp: number;
-// }
-
-// const storedToken = localStorage.getItem("authToken");
-// let storedUser = null;
-
-// if (storedToken) {
-//   try {
-//     const decoded: DecodedToken = jwtDecode(storedToken);
-//     storedUser = { id: decoded._id, email: decoded.email, role: decoded.role };
-//   } catch (err) {
-//     console.error("Invalid token in localStorage", err);
-//     localStorage.removeItem("authToken");
-//   }
-// }
-
-// export const useAuthStore = create<AuthState>((set) => ({
-//   token: storedToken,
-//   user: storedUser,
-//   setToken: (token) => {
-//     localStorage.setItem("authToken", token);
-//     const decoded: DecodedToken = jwtDecode(token);
-//     set({ token, user: { id: decoded._id, email: decoded.email, role: decoded.role } });
-//   },
-//   setUser: (user) => set({ user }),
-//   logout: () => {
-//     localStorage.removeItem("authToken");
-//     set({ token: null, user: null });
-//   },
-// }));
-

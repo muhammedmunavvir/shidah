@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 import ReactQueryProvider from "@/providers/ReactQueryProvider";
 import Script from "next/script";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,20 +23,27 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-         <ReactQueryProvider>
-          {children}
-          <Toaster richColors position="top-center" />
-        <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
-
-        </ReactQueryProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          <ReactQueryProvider>
+            {children}
+            <Toaster richColors position="top-center" />
+            <Script
+              src="https://checkout.razorpay.com/v1/checkout.js"
+              strategy="afterInteractive"
+            />
+          </ReactQueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
