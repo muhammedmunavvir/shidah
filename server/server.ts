@@ -9,6 +9,7 @@ import authrouter from "./src/routes/auth.route.js";
 import cartrouter from "./src/routes/cartroute.js";
 import Ordercreationroute from "./src/routes/OrderCreation.route.js";
 import myorderRoute from "./src/routes/myorder.route.js";
+import adminRoute from "./src/routes/admin.route.js";
 
 dotenv.config();
 connectDB();      
@@ -26,6 +27,9 @@ app.use("/api/v1/auth", authrouter);
 app.use("/api/v1/cart",cartrouter)
 app.use("/api/v1/order",Ordercreationroute)
 app.use("/api/v1/order",myorderRoute)
+
+//admin routes
+app.use("/api/v1/admin",adminRoute)
 
 // Default route
 app.get("/", (req, res) => {

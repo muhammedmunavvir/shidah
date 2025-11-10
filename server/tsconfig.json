@@ -9,8 +9,15 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
-    "rootDir": "./"
+    "rootDir": "./",
+    "types": ["node", "express", "multer"],       
+    "resolveJsonModule": true                     
   },
-  "include": ["**/*"],
+  "include": [
+    "src",
+    "types",                                      
+    "server.ts",
+    "**/*.ts"
+  ],
   "exclude": ["node_modules", "dist"]
 }
