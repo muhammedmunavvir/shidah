@@ -34,8 +34,12 @@ const GoogleSuccess = () => {
       // wait a tick so store updates are applied
       setTimeout(() => {
         setLoading(false);
-        router.push("/");
-      }, 0);
+        if(decoded.role=="admin"){
+          router.push("/admin")
+        }else{
+          router.push("/")
+        }
+      }, 1000);
     } else {
       setLoading(false);
       router.push("/googleauthlogin");

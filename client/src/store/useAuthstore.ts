@@ -13,8 +13,11 @@ interface AuthState {
   token: string | null;
   user: User | null;
   setToken: (token: string) => void;
+  hydrated:boolean;
+  setHydrated: (value: boolean) => void;
   setUser: (user: Partial<User>) => void;
   logout: () => void;
+
 }
 
 interface DecodedToken {
@@ -31,6 +34,8 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
+      hydrated:false,
+     setHydrated: (value) => set({ hydrated: value }),
 
       setToken: (token) => {
         try {
@@ -62,6 +67,10 @@ export const useAuthStore = create<AuthState>()(
     {
       name: "authToken",
       storage: createJSONStorage(() => localStorage),
+       onRehydrateStorage: () => (state) => {
+        // 👇 Fires when Zustand finishes hydrating from localStorage
+        state?.setHydrated(true);
+      },
     }
   )
 );

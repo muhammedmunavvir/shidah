@@ -19,13 +19,22 @@ const salesData = [
 export default function DashboardPage() {
 
   const router = useRouter();
-  const { user } = useAuthStore();
-  console.log(user?.role,"rooole")
-  useEffect(() => {
-    if (user?.role !== "admin") {
-      router.push("/");
+  const { user ,hydrated} = useAuthStore();
+  console.log(user?.role,"user .role in admin page.tsx")
+ useEffect(() => {
+    if (!hydrated) return; // wait until Zustand store is ready
+    if (!user || user.role !== "admin") {
+      router.replace("/");
     }
-  }, [user, router]);
+  }, [hydrated, user, router]);
+
+  if(!hydrated){
+    return (
+       <div className="flex justify-center items-center h-screen">
+        <p className="text-gray-500 dark:text-gray-300">Loading dashboard...</p>
+      </div>
+    )
+  }
   return (
     <div className="space-y-8">
       {/* Page Title */}
