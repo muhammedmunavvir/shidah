@@ -78,11 +78,11 @@ export default function CheckoutPage() {
 
       // Open Razorpay checkout using the response
       openRazorpay({
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, // from .env
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, 
         orderId: data.order.id, // Razorpay order ID
-        amount: data.order.amount, // Amount in paise
+        amount: data.order.amount, 
         currency: data.order.currency,
-        name: "ClickStore",
+        name: "shidah.in",
         description: "Secure payment with Razorpay",
         prefill: {
           name: `${UserContactInformation.FirstName} ${UserContactInformation.LastName}`,

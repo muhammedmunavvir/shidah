@@ -7,7 +7,6 @@ import { useAuthStore } from "@/store/useAuthstore";
 import { useEffect } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-    console.log("✅ Admin layout loaded");
 
   const pathname = usePathname();
   const router = useRouter();

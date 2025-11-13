@@ -1,8 +1,7 @@
 import cloudinary from "../lib/cloudinary";
 import { Request,Response } from "express";
 export const uploadProductImage = async (req:Request, res:Response) => {
-    console.log(req.url)
-    console.log(req.body)
+   
   try {
     const file = req.file || req.files?.file;
 

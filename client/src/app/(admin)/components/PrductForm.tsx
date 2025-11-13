@@ -2,6 +2,8 @@
 import { useState } from "react";
 import UploadImage from "./ProductImageUpload";
 import { Loader2 } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { CreateProductApi } from "@/api/adminapi";
 
 export default function ProductForm() {
   const [formData, setFormData] = useState({
@@ -22,29 +24,45 @@ export default function ProductForm() {
     tags: "",
   });
 
-  const [loading, setLoading] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    const productData = {
-      ...formData,
-      tags: formData.tags.split(",").map((t) => t.trim()),
-    };
-
-    const res = await fetch("/api/products", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(productData),
-    });
-
-    setLoading(false);
-    alert(res.ok ? "✅ Product added successfully!" : "❌ Failed to add product");
-  };
+  const createProductMutation = useMutation({
+    mutationFn: CreateProductApi,
+    onSuccess: (data) => {
+      // reset form on success (optional)
+      setFormData({
+        name: "",
+        description: "",
+        price: "",
+        discountPrice: "",
+        currency: "INR",
+        stock: "",
+        category: "",
+        discount: "",
+        badge: "",
+        sizes: [],
+        colors: [],
+        images: [],
+        isBestSeller: false,
+        isPremium: false,
+        tags: "",
+      });
+      alert(" Product added successfully!");
+    },
+    onError: (err: any) => {
+      console.error(err);
+      alert(" Failed to add product");
+    },
+  });
 
   const addImage = (url: string) => {
+    console.log(url, "urllll");
     setFormData((prev) => ({ ...prev, images: [...prev.images, url] }));
+  };
+
+  const removeImage = (url: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      images: prev.images.filter((img) => img !== url),
+    }));
   };
 
   const toggleArrayValue = (key: "sizes" | "colors", value: string) => {
@@ -58,6 +76,28 @@ export default function ProductForm() {
       };
     });
   };
+
+  // ----- handleSubmit wired to React Query -----
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // prepare payload
+    const payload = {
+      ...formData,
+      // convert tags string to array
+      tags: formData.tags ? formData.tags.split(",").map((t) => t.trim()) : [],
+      // convert numeric fields if needed (optional)
+      price: formData.price ? Number(formData.price) : undefined,
+      discountPrice: formData.discountPrice
+        ? Number(formData.discountPrice)
+        : undefined,
+      stock: formData.stock ? Number(formData.stock) : undefined,
+    };
+
+    createProductMutation.mutate(payload);
+  };
+
+  const isSubmitting = createProductMutation.isPending;
 
   return (
     <div className="max-w-3xl mx-auto p-8 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700">
@@ -91,7 +131,7 @@ export default function ProductForm() {
               setFormData({ ...formData, description: e.target.value })
             }
             className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 bg-transparent text-gray-800 dark:text-gray-100"
-          ></textarea>
+          />
         </div>
 
         {/* Pricing */}
@@ -103,7 +143,9 @@ export default function ProductForm() {
             <input
               type="number"
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, price: e.target.value })
+              }
               className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2"
             />
           </div>
@@ -217,12 +259,20 @@ export default function ProductForm() {
           <UploadImage onUpload={addImage} />
           <div className="flex gap-3 mt-3 flex-wrap">
             {formData.images.map((url, i) => (
-              <img
-                key={i}
-                src={url}
-                alt="product"
-                className="w-24 h-24 object-cover rounded-md border border-gray-200 dark:border-gray-700"
-              />
+              <div key={i} className="relative">
+                <img
+                  src={url}
+                  alt="product"
+                  className="w-24 h-24 object-cover rounded-md border border-gray-200 dark:border-gray-700"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeImage(url)}
+                  className="absolute top-1 right-1 bg-red-600 text-white rounded-full px-2 text-xs"
+                >
+                  ✕
+                </button>
+              </div>
             ))}
           </div>
         </div>
@@ -268,10 +318,10 @@ export default function ProductForm() {
         {/* Submit */}
         <button
           type="submit"
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium flex justify-center items-center gap-2 transition"
+          disabled={isSubmitting}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium flex justify-center items-center gap-2 transition disabled:opacity-60"
         >
-          {loading ? (
+          {isSubmitting ? (
             <>
               <Loader2 size={18} className="animate-spin" />
               Saving...

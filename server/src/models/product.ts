@@ -10,7 +10,7 @@ const productSchema = new Schema<IProduct>(
     currency: { type: String, default: "INR" },
     stock: { type: Number, required: true, default: 0 },
     category: { type: String, required: true },
-    discount:{type:String,required:true},
+    discount:{type:String,required:false},
     badge:{type:String,required:true},
     // subCategory: { type: String },
     sizes: [{ type: String }],

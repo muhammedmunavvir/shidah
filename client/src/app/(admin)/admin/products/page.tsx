@@ -3,22 +3,18 @@
 import { PlusCircle, Edit, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useProductStore } from "@/store/useProductstore";
+import { getProducts } from "@/api/product";
 
 export default function AdminProductPage() {
-  const [products, setProducts] = useState<any[]>([]);
+    const { products, setProducts } = useProductStore();
 
-  // 🧠 Fetch real data from your /api/products route
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await fetch("/api/products");
-        const data = await res.json();
-        setProducts(data);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
+    const fetchData = async () => {
+      const data = await getProducts();   // fetch from backend
+      setProducts(data);                  // store in Zustand
     };
-    fetchProducts();
+    fetchData();
   }, []);
 
   return (
@@ -61,7 +57,7 @@ export default function AdminProductPage() {
                 >
                   <td className="p-3">
                     <img
-                      src={p.imageUrl}
+                    src={p.images[0] || "/placeholder.svg"}
                       alt={p.name}
                       className="w-12 h-12 object-cover rounded-md"
                     />
