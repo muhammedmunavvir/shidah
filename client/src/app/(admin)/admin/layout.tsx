@@ -2,18 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Package, Settings, LogOut,Boxes } from "lucide-react";
+import { LayoutDashboard, Users, Package, Settings, LogOut, Boxes, Menu } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthstore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-
   const pathname = usePathname();
   const router = useRouter();
-  const { user, logout,hydrated } = useAuthStore();
+  const { user, logout, hydrated } = useAuthStore();
 
-   useEffect(() => {
-    if (!hydrated) return; // wait until Zustand store is ready
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    if (!hydrated) return;
     if (!user || user.role !== "admin") {
       router.replace("/");
     }
@@ -28,18 +29,31 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900 ">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-screen w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <div className="p-4 border-b dark:border-gray-700">
+    <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+      {/* MOBILE TOP BAR */}
+      <div className="md:hidden fixed top-0 left-0 right-0 h-14 flex items-center justify-between px-4 bg-white dark:bg-gray-800 border-b z-50">
+        <h2 className="text-lg font-bold">Admin Panel</h2>
+        <button onClick={() => setMobileOpen(!mobileOpen)}>
+          <Menu size={24} className="text-gray-700 dark:text-gray-300" />
+        </button>
+      </div>
+
+      {/* SIDEBAR */}
+      <aside
+        className={`fixed top-0 left-0 h-screen w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 
+        transition-transform duration-300 z-40
+        ${mobileOpen ? "translate-x-0" : "-translate-x-64"} md:translate-x-0`}
+      >
+        <div className="p-4 border-b dark:border-gray-700 hidden md:block">
           <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">Admin Panel</h2>
         </div>
 
-        <nav className="flex flex-col p-4 space-y-2">
+        <nav className="flex flex-col p-4 space-y-2 pt-16 md:pt-4">
           {navItems.map((item) => (
             <Link
               key={item.name}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition ${
                 pathname === item.href
                   ? "bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-200"
@@ -67,8 +81,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="ml-64 flex-1 p-6 overflow-y-auto">{children}</main>
+      {/* MAIN CONTENT */}
+      <main className="flex-1 p-6 md:ml-64 pt-16 md:pt-6 overflow-y-auto">
+        {children}
+      </main>
     </div>
   );
 }
