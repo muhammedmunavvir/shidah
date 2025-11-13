@@ -4,7 +4,7 @@ import { Request, Response } from "express";
 
 export const GetAllOrders = async (req: Request, res: Response) => {
   try {
-    const Allorders = await OrderModel.find();
+    const Allorders = await OrderModel.find().sort({ createdAt: -1 });
     res.json({ status: "success", message: "Get All users", data: Allorders });
   } catch (error) {
     console.log(error);

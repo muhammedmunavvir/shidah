@@ -235,6 +235,7 @@ export default function Navbar() {
                   <DropdownMenuItem>
                     {/* <User  className="mr-2 h-4 w-4" /> Profile */}
                     <img
+                    referrerPolicy="no-referrer"
                       src={user?.photo || "/default-avatar.png"}
                       alt="profile photo"
                       className="mr-2 h-7 w-7 rounded-full object-cover"

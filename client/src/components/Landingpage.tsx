@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   ArrowRight,
-  Shirt,
   Zap,
   Star,
   Heart,
@@ -18,22 +17,16 @@ import {
 
 export default function Landingpage() {
   const [isVisible, setIsVisible] = useState(false);
-  const [hoveredProduct, setHoveredProduct] = useState(null);
-  const [favorites, setFavorites] = useState(new Set());
+  const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
+  const [favorites, setFavorites] = useState(new Set<number>());
 
-  useEffect(() => {
-    setIsVisible(true);
-  }, []);
+  useEffect(() => setIsVisible(true), []);
 
-  const toggleFavorite = (productId: any) => {
+  const toggleFavorite = (productId: number) => {
     setFavorites((prev) => {
-      const newFavorites = new Set(prev);
-      if (newFavorites.has(productId)) {
-        newFavorites.delete(productId);
-      } else {
-        newFavorites.add(productId);
-      }
-      return newFavorites;
+      const newFav = new Set(prev);
+      newFav.has(productId) ? newFav.delete(productId) : newFav.add(productId);
+      return newFav;
     });
   };
 
@@ -126,92 +119,86 @@ export default function Landingpage() {
 
   const categories = [
     { name: "All Products", count: clothingProducts.length, active: true },
-    { name: "Hoodies", count: 12, active: false },
-    { name: "Jackets", count: 8, active: false },
-    { name: "Dresses", count: 15, active: false },
-    { name: "Shirts", count: 24, active: false },
-    { name: "Activewear", count: 18, active: false },
+    { name: "Hoodies", count: 12 },
+    { name: "Jackets", count: 8 },
+    { name: "Dresses", count: 15 },
+    { name: "Shirts", count: 24 },
+    { name: "Activewear", count: 18 },
   ];
 
-  const getBadgeColor = (badge: any) => {
-    switch (badge) {
-      case "Best Seller":
-        return "bg-gradient-to-r from-yellow-400 to-orange-400";
-      case "New Arrival":
-        return "bg-gradient-to-r from-green-400 to-emerald-400";
-      case "Premium":
-        return "bg-gradient-to-r from-purple-400 to-indigo-400";
-      case "Trending":
-        return "bg-gradient-to-r from-blue-400 to-cyan-400";
-      case "Sport":
-        return "bg-gradient-to-r from-red-400 to-pink-400";
-      case "Limited":
-        return "bg-gradient-to-r from-gray-400 to-gray-600";
-      default:
-        return "bg-gradient-to-r from-purple-400 to-indigo-400";
-    }
+  const getBadgeColor = (badge: string) => {
+    const colors: any = {
+      "Best Seller": "from-yellow-400 to-orange-400",
+      "New Arrival": "from-green-400 to-emerald-400",
+      Premium: "from-purple-400 to-indigo-400",
+      Trending: "from-blue-400 to-cyan-400",
+      Sport: "from-red-400 to-pink-400",
+      Limited: "from-gray-400 to-gray-600",
+    };
+    return `bg-gradient-to-r ${colors[badge] || "from-purple-400 to-indigo-400"}`;
   };
 
   return (
-    <section className="relative min-h-screen bg-gradient-to-br from-black via-[#0a0014] to-purple-950 overflow-hidden">
-      {/* Animated background grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f20_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f20_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+    <section
+      className="
+        relative min-h-screen overflow-hidden
+        bg-white text-gray-900
+        dark:bg-gradient-to-br dark:from-black dark:via-[#0a0014] dark:to-purple-950 dark:text-white
+      "
+    >
+      {/* GRID */}
+      <div
+        className="
+          absolute inset-0
+          bg-[linear-gradient(to_right,#e5e7eb30_1px,transparent_1px),linear-gradient(to_bottom,#e5e7eb30_1px,transparent_1px)]
+          dark:bg-[linear-gradient(to_right,#4f4f4f20_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f20_1px,transparent_1px)]
+          bg-[size:14px_24px]
+        "
+      />
 
-      {/* Floating orbs */}
+      {/* ORBS */}
       <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-700 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" />
-        <div className="absolute top-3/4 right-1/4 w-72 h-72 bg-indigo-700 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-2000" />
-        <div className="absolute top-1/2 left-1/2 w-72 h-72 bg-violet-700 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-4000" />
-      </div>
-
-      {/* Floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          >
-            <Star className="w-2 h-2 text-purple-300 opacity-20" />
-          </div>
-        ))}
+        <div className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-20 bg-purple-300 dark:bg-purple-700 animate-pulse" />
+        <div className="absolute top-3/4 right-1/4 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-20 bg-indigo-300 dark:bg-indigo-700 animate-pulse" />
+        <div className="absolute top-1/2 left-1/2 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-20 bg-violet-300 dark:bg-violet-700 animate-pulse" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-20">
-        {/* Heading Section */}
+        {/* Title Section */}
         <div
           className={`text-center mb-16 transition-all duration-1000 ${
             isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
           }`}
         >
-          {/* Top Badge */}
           <Badge
             variant="secondary"
-            className="mb-8 bg-purple-900/30 text-purple-300 border-purple-400/30 backdrop-blur-sm hover:bg-purple-800/40 transition-colors px-4 py-2 text-sm font-medium"
+            className="
+              mb-8 px-4 py-2 text-sm font-medium
+              bg-purple-100 text-purple-700 border-purple-300
+              dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-400/30
+              backdrop-blur-sm transition-colors
+            "
           >
-            <Sparkles className="w-4 h-4 mr-2 text-yellow-400" />
+            <Sparkles className="w-4 h-4 mr-2" />
             Featured Collection 2024
           </Badge>
 
-          <h2 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-none">
-            <span className="block bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent mb-2">
+          <h2 className="text-6xl font-black mb-6">
+            <span className="block bg-gradient-to-r from-gray-900 to-gray-500 dark:from-white dark:to-gray-400 bg-clip-text text-transparent">
               Discover
             </span>
-            <span className="block bg-gradient-to-r from-purple-400 via-violet-500 to-indigo-400 bg-clip-text text-transparent animate-pulse">
+            <span className="block bg-gradient-to-r from-purple-500 via-violet-600 to-indigo-500 dark:from-purple-400 dark:via-violet-500 dark:to-indigo-400 bg-clip-text text-transparent animate-pulse">
               Premium Style
             </span>
           </h2>
 
-          <p className="text-xl md:text-2xl max-w-4xl mx-auto mb-12 text-gray-300 font-light leading-relaxed">
+          <p className="text-xl text-gray-700 dark:text-gray-300 max-w-3xl mx-auto">
             Curated collections of{" "}
-            <span className="font-semibold text-white">premium clothing</span>{" "}
+            <span className="font-semibold text-gray-900 dark:text-white">
+              premium clothing
+            </span>{" "}
             designed to{" "}
-            <span className="font-semibold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
+            <span className="font-semibold bg-gradient-to-r from-purple-500 to-indigo-500 bg-clip-text text-transparent">
               elevate your style
             </span>{" "}
             and express your unique personality.
@@ -219,182 +206,138 @@ export default function Landingpage() {
         </div>
 
         {/* Category Filter */}
-        <div
-          className={`flex flex-wrap justify-center gap-3 mb-16 transition-all duration-1000 delay-200 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          {categories.map((category, index) => (
+        <div className="flex flex-wrap justify-center gap-3 mb-16">
+          {categories.map((c, index) => (
             <Button
               key={index}
-              variant={category.active ? "default" : "outline"}
-              className={`px-6 py-3 rounded-full text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
-                category.active
-                  ? "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-2xl shadow-purple-500/25"
-                  : "border-purple-400/40 bg-purple-900/20 text-gray-300 hover:bg-purple-900/40 hover:text-white hover:border-purple-300/60"
-              }`}
+              variant={c.active ? "default" : "outline"}
+              className={`
+                px-6 py-3 rounded-full text-sm font-medium transition-all
+                ${
+                  c.active
+                    ? "bg-purple-600 hover:bg-purple-700 text-white shadow-md"
+                    : "border-gray-400 text-gray-700 bg-white hover:bg-gray-100 dark:border-purple-400/40 dark:bg-purple-900/20 dark:text-gray-300"
+                }
+              `}
             >
-              {category.name}
-              <span className="ml-2 text-xs opacity-70">
-                ({category.count})
-              </span>
+              {c.name} <span className="opacity-60 ml-1">({c.count})</span>
             </Button>
           ))}
         </div>
 
         {/* Products Grid */}
-        <div
-          className={`grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          {clothingProducts.map((product, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          {clothingProducts.map((product) => (
             <Card
               key={product.id}
-              className="group bg-purple-900/20 border-purple-400/30 backdrop-blur-sm 
-             hover:bg-purple-900/40 transition-all duration-500 
-             hover:scale-105 hover:shadow-xl hover:shadow-purple-500/25 
-             cursor-pointer overflow-hidden"
+              className="
+                group cursor-pointer overflow-hidden
+                bg-white border-gray-200 shadow-sm
+                dark:bg-purple-900/20 dark:border-purple-400/30
+                transition-all hover:scale-105 hover:shadow-xl
+              "
               onMouseEnter={() => setHoveredProduct(product.id)}
               onMouseLeave={() => setHoveredProduct(null)}
             >
               <CardContent className="p-4">
-                {/* Product Image */}
-                <div className="relative overflow-hidden rounded-lg">
+                {/* Image */}
+                <div className="relative rounded-lg overflow-hidden">
                   <img
                     src={product.image}
-                    alt={product.name}
-                    className="w-full h-48 object-cover transition-transform duration-700 group-hover:scale-110"
+                    className="w-full h-48 object-cover transition duration-500 group-hover:scale-110"
                   />
 
-                  {/* Overlay Actions */}
+                  {/* Hover buttons */}
                   <div
-                    className={`absolute inset-0 bg-black/60 flex items-center justify-center gap-2 
-        transition-opacity duration-300 ${
-          hoveredProduct === product.id ? "opacity-100" : "opacity-0"
-        }`}
+                    className={`absolute inset-0 flex items-center justify-center gap-3 bg-black/60 transition-all duration-300 ${
+                      hoveredProduct === product.id ? "opacity-100" : "opacity-0"
+                    }`}
                   >
                     <Button
                       size="sm"
                       variant="outline"
-                      className="border-purple-400/40 bg-purple-900/40 text-white 
-                     hover:bg-purple-900/60 backdrop-blur-sm"
+                      className="
+                        border-gray-300 bg-white/30 text-gray-900
+                        dark:border-purple-400/40 dark:bg-purple-900/40 dark:text-white
+                      "
                     >
-                      <Eye className="w-4 h-4 mr-1" /> View
+                      <Eye className="w-4 h-4 mr-2" />
+                      View
                     </Button>
+
                     <Button
                       size="sm"
-                      className="bg-gradient-to-r from-purple-600 to-indigo-600 
-                     hover:from-purple-700 hover:to-indigo-700 text-white"
+                      className="
+                        bg-purple-600 hover:bg-purple-700 text-white
+                        dark:bg-gradient-to-r dark:from-purple-600 dark:to-indigo-600
+                      "
                     >
-                      <ShoppingCart className="w-4 h-4 mr-1" /> Cart
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Cart
                     </Button>
                   </div>
 
                   {/* Badge */}
                   <div
-                    className={`absolute top-3 left-3 px-2 py-0.5 ${getBadgeColor(
+                    className={`absolute top-3 left-3 px-2 py-1 text-[10px] text-white rounded-full ${getBadgeColor(
                       product.badge
-                    )} rounded-full`}
+                    )}`}
                   >
-                    <span className="text-white text-[10px] font-semibold">
-                      {product.badge}
-                    </span>
+                    {product.badge}
                   </div>
 
                   {/* Discount */}
-                  <div
-                    className="absolute top-3 right-3 bg-gradient-to-r from-red-500 to-pink-500 
-                      text-white px-2 py-0.5 rounded-full text-[10px] font-bold"
-                  >
+                  <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 text-[10px] rounded-full">
                     {product.discount}
                   </div>
 
                   {/* Favorite */}
                   <button
                     onClick={() => toggleFavorite(product.id)}
-                    className="absolute bottom-3 right-3 p-2 bg-purple-900/40 backdrop-blur-sm 
-                   rounded-full hover:bg-purple-900/60 border border-purple-400/30"
+                    className="
+                      absolute bottom-3 right-3 p-2 rounded-full backdrop-blur-sm
+                      bg-gray-200/60 hover:bg-gray-300
+                      dark:bg-purple-900/40 dark:hover:bg-purple-800/50
+                      border dark:border-purple-400/30
+                    "
                   >
                     <Heart
-                      className={`w-4 h-4 transition-colors ${
+                      className={`w-4 h-4 ${
                         favorites.has(product.id)
-                          ? "text-red-400 fill-current"
-                          : "text-white"
+                          ? "text-red-500 fill-red-500"
+                          : "text-gray-700 dark:text-white"
                       }`}
                     />
                   </button>
                 </div>
 
-                {/* Info */}
-                <div className="mt-4">
+                {/* Product Info */}
+                <div className="mt-3">
                   <div className="flex items-center justify-between mb-2">
                     <Badge
                       variant="secondary"
-                      className="bg-purple-900/30 text-purple-300 border-purple-400/30 text-[10px]"
+                      className="
+                        px-2 py-1 text-[10px]
+                        bg-gray-200 text-gray-700 border-gray-300
+                        dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-400/30
+                      "
                     >
                       {product.category}
                     </Badge>
-                    <div className="flex items-center space-x-1 text-xs">
-                      <Star className="w-3 h-3 text-yellow-400 fill-current" />
-                      <span className="text-gray-300">{product.rating}</span>
+
+                    <div className="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
+                      <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                      {product.rating}
                     </div>
                   </div>
 
-                  <h3
-                    className="text-lg font-bold text-white mb-2 line-clamp-1 
-                     group-hover:bg-gradient-to-r group-hover:from-purple-400 
-                     group-hover:to-indigo-400 group-hover:bg-clip-text 
-                     group-hover:text-transparent transition-all duration-300"
-                  >
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white group-hover:text-purple-500 dark:group-hover:bg-gradient-to-r dark:group-hover:from-purple-400 dark:group-hover:to-indigo-400 dark:group-hover:bg-clip-text dark:group-hover:text-transparent transition">
                     {product.name}
                   </h3>
 
-                  {/* Colors (smaller) */}
-                  <div className="flex items-center gap-1 mb-3">
-                    {product.colors.slice(0, 2).map((color, idx) => (
-                      <div
-                        key={idx}
-                        className="w-4 h-4 rounded-full border border-purple-400/30"
-                        style={{
-                          backgroundColor:
-                            color.toLowerCase() === "white"
-                              ? "#ffffff"
-                              : color.toLowerCase() === "black"
-                              ? "#000000"
-                              : color.toLowerCase() === "navy"
-                              ? "#1e3a8a"
-                              : color.toLowerCase() === "gray"
-                              ? "#6b7280"
-                              : color.toLowerCase() === "light blue"
-                              ? "#93c5fd"
-                              : color.toLowerCase() === "blue"
-                              ? "#3b82f6"
-                              : color.toLowerCase() === "burgundy"
-                              ? "#881337"
-                              : color.toLowerCase() === "emerald"
-                              ? "#10b981"
-                              : color.toLowerCase() === "pink"
-                              ? "#ec4899"
-                              : color.toLowerCase() === "brown"
-                              ? "#92400e"
-                              : color.toLowerCase() === "charcoal"
-                              ? "#374151"
-                              : "#8b5cf6",
-                        }}
-                        title={color}
-                      />
-                    ))}
-                    {product.colors.length > 2 && (
-                      <div className="text-gray-400 text-[10px]">
-                        +{product.colors.length - 2}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Price row */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-lg font-black text-white">
+                  {/* Price */}
+                  <div className="flex justify-between items-center mt-1">
+                    <span className="text-lg font-black text-gray-900 dark:text-white">
                       ${product.price}
                     </span>
                     <span className="text-sm text-gray-400 line-through">
@@ -407,30 +350,19 @@ export default function Landingpage() {
           ))}
         </div>
 
-        {/* View All Section */}
-        <div
-          className={`text-center transition-all duration-1000 delay-600 ${
-            isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
-          }`}
-        >
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold px-8 py-6 text-lg shadow-2xl hover:shadow-purple-500/25 transition-all duration-300 transform hover:scale-105 group"
-            >
-              <ShoppingBag className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform" />
-              View All Products
-              <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              variant="outline"
-              size="lg"
-              className="border-purple-400/40 bg-purple-900/20 text-white hover:bg-purple-900/40 backdrop-blur-sm font-semibold px-8 py-6 text-lg transition-all duration-300 transform hover:scale-105"
-            >
-              <Heart className="w-5 h-5 mr-2" />
-              View Wishlist
-            </Button>
-          </div>
+        {/* View all */}
+        <div className="text-center mt-16">
+          <Button
+            size="lg"
+            className="
+              bg-purple-600 hover:bg-purple-700 text-white px-8 py-6
+              dark:bg-gradient-to-r dark:from-purple-600 dark:to-indigo-600
+            "
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            View All Products
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Button>
         </div>
       </div>
     </section>
