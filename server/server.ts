@@ -1,45 +1,49 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { connectDB } from "./src/config/db.js";
-import productRouter from "./src/routes/productroute.js";
 import passport from "passport";
-import "./src/config/passport.js"; // initialize Google strategy
-import authrouter from "./src/routes/auth.route.js";
-import cartrouter from "./src/routes/cartroute.js";
-import Ordercreationroute from "./src/routes/OrderCreation.route.js";
-import myorderRoute from "./src/routes/myorder.route.js";
-import adminRoute from "./src/routes/admin.route.js";
+
+import { connectDB } from "./src/config/db";
+import productRouter from "./src/routes/productroute";
+import authrouter from "./src/routes/auth.route";
+import cartrouter from "./src/routes/cartroute";
+import Ordercreationroute from "./src/routes/OrderCreation.route";
+import myorderRoute from "./src/routes/myorder.route";
+import adminRoute from "./src/routes/admin.route";
+import "./src/config/passport"; 
 
 dotenv.config();
-connectDB();      
+connectDB();
 
-const app = express();  
+const app = express();
 
-// Middleware
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+// CORS for development + production
+app.use(cors({
+  origin: [
+    "http://localhost:3000",
+    "https://shidah.vercel.app"   // replace after deployment
+  ],
+  credentials: true
+}));
+
 app.use(express.json());
-app.use(passport.initialize());  
-   
+app.use(passport.initialize());
+
 // Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/auth", authrouter);
-app.use("/api/v1/cart",cartrouter)
-app.use("/api/v1/order",Ordercreationroute)
-app.use("/api/v1/order",myorderRoute)
+app.use("/api/v1/cart", cartrouter);
+app.use("/api/v1/order", Ordercreationroute);
+app.use("/api/v1/order", myorderRoute);
 
-//admin routes
-app.use("/api/v1/admin",adminRoute)
+// Admin Routes
+app.use("/api/v1/admin", adminRoute);
 
-// Default route
 app.get("/", (req, res) => {
   res.send("API is running");
-}); 
+});
 
-
-// Start server
-const PORT = process.env.PORT_NUMBER || 5002;
+const PORT = process.env.PORT || 5002;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-});    
-           
+});
