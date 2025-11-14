@@ -17,11 +17,11 @@ connectDB();
 
 const app = express();
 
-// CORS for development + production
+app.enable("trust proxy");
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://shidah.vercel.app"   // replace after deployment
+    "https://shidah.vercel.app"   
   ],
   credentials: true
 }));
