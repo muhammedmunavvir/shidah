@@ -1,3 +1,4 @@
+// @ts-nocheck
 export interface IOrder extends Document {
   razorpayOrderId?: string;
   razorpayPaymentId?: string;

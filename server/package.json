@@ -1,5 +1,4 @@
 {
-  "type": "module",
   "scripts": {
     "dev": "nodemon --exec tsx server.ts",
   "build": "tsc",

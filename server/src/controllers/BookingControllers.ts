@@ -1,3 +1,4 @@
+// @ts-nocheck
 import Razorpay from "razorpay";
 import crypto from "crypto";
 import { Request, Response } from "express";

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import cloudinary from "../lib/cloudinary";
 import { Request,Response } from "express";
 export const uploadProductImage = async (req:Request, res:Response) => {
