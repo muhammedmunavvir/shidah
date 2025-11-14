@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { generateToken } from "../util/jwt.js";
+import { generateToken } from "../util/jwt";
 import dotenv from "dotenv"
 dotenv.config()
 

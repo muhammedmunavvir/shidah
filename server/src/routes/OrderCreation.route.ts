@@ -1,5 +1,5 @@
 import express from "express"
-import { createOrder, verifyPayment } from "../controllers/BookingControllers.js"
+import { createOrder, verifyPayment } from "../controllers/BookingControllers"
 
 const Ordercreationroute=express.Router()
 

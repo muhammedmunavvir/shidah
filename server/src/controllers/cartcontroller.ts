@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { CartModel } from "../models/cartmodel.js";
+import { CartModel } from "../models/cartmodel";
 import { Types } from "mongoose";
 
 export const Getcartcontroller = async (req: Request, res: Response) => {

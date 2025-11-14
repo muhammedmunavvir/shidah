@@ -1,6 +1,6 @@
 import { Router } from "express";
 import passport from "passport";
-import { googleAuthCallback } from "../controllers/authcontroller.js";
+import { googleAuthCallback } from "../controllers/authcontroller";
 
 const authrouter = Router();
 
