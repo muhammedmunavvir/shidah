@@ -17,7 +17,7 @@ connectDB();
 
 const app = express();
 
-//app.enable("trust proxy");
+app.enable("trust proxy");
 app.use(cors({
   origin: [
     "http://localhost:3000",
