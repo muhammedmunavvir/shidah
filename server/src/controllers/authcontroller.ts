@@ -14,7 +14,7 @@ export const googleAuthCallback =async(req:Request,res:Response)=>{
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 60 * 1000 
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     // Redirect client with token
     res.redirect(`${process.env.CLIENT_URL}/auth/success`);
