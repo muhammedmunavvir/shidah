@@ -6,9 +6,9 @@ import Usermodel from "../models/usermodel";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleLogin = async (req: Request, res: Response) => {
-  console.log(req.body)
-  console.log(process.env.GOOGLE_CLIENT_ID)
-  
+  console.log(req.body);
+  console.log(process.env.GOOGLE_CLIENT_ID);
+
   try {
     const { credential } = req.body;
 
@@ -49,18 +49,18 @@ export const googleLogin = async (req: Request, res: Response) => {
       email: user.email,
       role: user.role,
       avatar: user.avatar,
-    }); 
+    });
 
     // Set HttpOnly cookie
-    const isProd = process.env.NODE_ENV === "production";  
+    const isProd = process.env.NODE_ENV === "production";
 
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
-      domain:"https://shidah.vercel.app",
+      domain: ".shidah.vercel.app",
       path: "/",
-      maxAge:  60 * 1000,
+      maxAge: 60 * 1000,
     });
 
     // Return response
@@ -68,7 +68,6 @@ export const googleLogin = async (req: Request, res: Response) => {
       success: true,
       user: user,
     });
-
   } catch (error) {
     console.error("Google Login Error:", error);
     return res.status(500).json({ success: false, message: "Login failed" });
