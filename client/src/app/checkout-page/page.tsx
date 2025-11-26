@@ -47,7 +47,7 @@ export default function CheckoutPage() {
 
   // Form states
   const [UserContactInformation, setUserContactInformation] = useState({
-    userId: user?.id || "",
+    userId: user?._id || "",
     FirstName: "",
     LastName: "",
     EmailAddress: user?.email || "",
@@ -101,6 +101,7 @@ export default function CheckoutPage() {
       });
     },
     onError: (error: any) => {
+      console.log(error)
       toast.error(error?.response?.data?.message || "Something went wrong!");
     },
   });

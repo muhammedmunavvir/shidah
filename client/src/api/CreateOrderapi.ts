@@ -21,7 +21,7 @@ interface OrderPayload {
 
 export const createOrderApi = async (orderData: OrderPayload) => {
   const { user } = useAuthStore.getState();
-  const userId = user?.id;
+  const userId = user?._id;
 
   if (!userId) throw new Error("User not logged in");
 

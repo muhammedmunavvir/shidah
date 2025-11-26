@@ -29,7 +29,7 @@ export default function Navbar() {
 
   // Fetch cart when Navbar mounts
   useEffect(() => {
-    if (user?.id) {
+    if (user?._id) {
       Getitem();
     }
   }, [user, Getitem]);
@@ -236,7 +236,7 @@ export default function Navbar() {
                     {/* <User  className="mr-2 h-4 w-4" /> Profile */}
                     <img
                     referrerPolicy="no-referrer"
-                      src={user?.photo || "/default-avatar.png"}
+                      src={user?.avatar || "/default-avatar.png"}
                       alt="profile photo"
                       className="mr-2 h-7 w-7 rounded-full object-cover"
                     />

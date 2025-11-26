@@ -34,7 +34,6 @@ export default function Usercart() {
     };
     loadCart();
   }, [Getitem]);
-console.log(items,"iiii")
   const calculateTotal = () => {
     return items.reduce(
       (sum, item) =>

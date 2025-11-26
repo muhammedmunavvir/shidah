@@ -19,7 +19,7 @@ export const addToCart = async (body: AddToCartBody) => {
 
 export const getusercartapi = async () => {
   const { user } = useAuthStore.getState();
-  const userId = user?.id;
+  const userId = user?._id;
   try {
     const response = await api.get(`/cart/getusercart/${userId}`);
     return response.data;
@@ -29,7 +29,7 @@ export const getusercartapi = async () => {
 };
 export const removeitemapi = async (productId: any) => {
   const { user } = useAuthStore.getState();
-  const userId = user?.id;
+  const userId = user?._id;
   try {
     const response = await api.delete(
       `/cart/removecartitem/${userId}/${productId}`
@@ -44,7 +44,7 @@ export const updateQuantityApi = async (payload: {
   qty: number;
 }) => {
   const { user } = useAuthStore.getState();
-  const userId = user?.id;
+  const userId = user?._id;
   try {
     const response = await api.put(`/cart/update-quantity`, {
       userId,

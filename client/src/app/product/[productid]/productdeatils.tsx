@@ -13,6 +13,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/userCartstore";
 export default function Productdetails({ product }: { product: Product }) {
   const { user } = useAuthStore();
+  console.log(user)
   const { addItem } = useCartStore();
   return (
     <>
@@ -138,7 +139,7 @@ export default function Productdetails({ product }: { product: Product }) {
                 }
 
                 try {
-                  if (!user?.id) {
+                  if (!user?._id) {
                     toast.error("User not found, please login again!");
                     return;
                   }
@@ -146,7 +147,7 @@ export default function Productdetails({ product }: { product: Product }) {
                   await addItem({
                     productId: product._id,
                     qty: 1,
-                    userId: user?.id,
+                    userId: user?._id,
                   });
                 } catch (error) {
                   toast.error("Failed to add item to cart!");
