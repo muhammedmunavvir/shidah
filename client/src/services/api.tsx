@@ -1,24 +1,25 @@
-
+import { useAuthStore } from "@/store/useAuthstore";
 import axios from "axios";
+import { toast } from "sonner";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5002/api/v1";
-
-console.log(API_URL,"NEXT_PUBLIC_API_UR")
 const api = axios.create({
-  baseURL: API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
-});
-
-api.interceptors.request.use((config) => {
-  if (typeof window !== "undefined") { // check if running in browser
-    const token = localStorage.getItem("authToken");
-    if (token && config.headers) {
-      config.headers["Authorization"] = `Bearer ${token}`;
-    }
-  }
-  return config;
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true,
 });
 
 export default api;
+
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      toast.error("Your session has expired. Please log in again.");
+      // JWT expired or invalid
+      const { logout } = useAuthStore.getState();
+      logout();
+      window.location.href = "/auth/googleauth";
+    }
+    return Promise.reject(error);
+  }
+);

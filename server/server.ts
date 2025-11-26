@@ -11,6 +11,7 @@ import Ordercreationroute from "./src/routes/OrderCreation.route";
 import myorderRoute from "./src/routes/myorder.route";
 import adminRoute from "./src/routes/admin.route";
 import "./src/config/passport"; 
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 connectDB();
@@ -27,6 +28,7 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(passport.initialize());
 
 // Routes

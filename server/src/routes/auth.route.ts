@@ -1,6 +1,7 @@
 import { Router } from "express";
 import passport from "passport";
-import { googleAuthCallback } from "../controllers/authcontroller.js";
+import { getMe, googleAuthCallback } from "../controllers/authcontroller.js";
+import { jwtverification } from "../middleware/tokenverification.js";
 
 const authrouter = Router();
 
@@ -16,5 +17,7 @@ authrouter.get(
   passport.authenticate("google", { session: false, failureRedirect: "/" }),
   googleAuthCallback
 );
+
+authrouter.get("/me", jwtverification, getMe);
 
 export default authrouter;

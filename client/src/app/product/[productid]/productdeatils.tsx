@@ -12,7 +12,7 @@ import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/userCartstore";
 export default function Productdetails({ product }: { product: Product }) {
-  const { user, token } = useAuthStore();
+  const { user } = useAuthStore();
   const { addItem } = useCartStore();
   return (
     <>
@@ -132,7 +132,7 @@ export default function Productdetails({ product }: { product: Product }) {
               size="lg"
               className="flex items-center gap-2"
               onClick={async () => {
-                if (!token) {
+                if (!user) {
                   alert("Please login first!");
                   return;
                 }
