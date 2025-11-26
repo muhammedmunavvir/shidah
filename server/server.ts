@@ -1,8 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import passport from "passport";
-
 import { connectDB } from "./src/config/db";
 import productRouter from "./src/routes/productroute";
 import authrouter from "./src/routes/auth.route";
@@ -10,7 +8,6 @@ import cartrouter from "./src/routes/cartroute";
 import Ordercreationroute from "./src/routes/OrderCreation.route";
 import myorderRoute from "./src/routes/myorder.route";
 import adminRoute from "./src/routes/admin.route";
-import "./src/config/passport"; 
 import cookieParser from "cookie-parser";
 
 dotenv.config();
@@ -29,7 +26,6 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(passport.initialize());
 
 // Routes
 app.use("/api/v1/products", productRouter);

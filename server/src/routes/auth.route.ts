@@ -1,23 +1,11 @@
-import { Router } from "express";
-import passport from "passport";
-import { getMe, googleAuthCallback } from "../controllers/authcontroller.js";
-import { jwtverification } from "../middleware/tokenverification.js";
+import express from "express";
+import { googleLogin } from "../controllers/authcontroller";
 
-const authrouter = Router();
+const router = express.Router();
 
-// Redirect to Google for authentication
-authrouter.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+router.post("/google/callback", googleLogin);
+// router.get("/me", jwtverification, (req, res) => {
+//   res.json({ user: req.user });
+// });
 
-// Google callback
-authrouter.get(
-  "/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: "/" }),
-  googleAuthCallback
-);
-
-authrouter.get("/me", jwtverification, getMe);
-
-export default authrouter;
+export default router;

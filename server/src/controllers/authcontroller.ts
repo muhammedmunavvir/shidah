@@ -1,36 +1,75 @@
-import { Request, Response } from "express"
-import { generateToken } from "../util/jwt.js";
-import dotenv from "dotenv"
-dotenv.config()
+import { Request, Response } from "express";
+import { OAuth2Client } from "google-auth-library";
+import { generateToken } from "../util/jwt";
+import Usermodel from "../models/usermodel";
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-
-
-export const googleAuthCallback =async(req:Request,res:Response)=>{
-    try {
-    const user = req.user as any; // Passport sets req.user
-    const token = generateToken({ id: user._id, email: user.email, role: user.role ,avatar: user.avatar,});
-    const isProd = process.env.NODE_ENV === "production";
-
-res.cookie("auth_token", token, {
-  httpOnly: true,
-  secure: isProd,                      // PROD → true, DEV → false
-  sameSite: isProd ? "none" : "lax",   // PROD → "none", DEV → "lax"
-  path: "/",
-  maxAge: 7 * 24 * 60 * 60 * 1000,
-});
-
-    // Redirect client with token
-    res.redirect(`${process.env.CLIENT_URL}/auth/success`);
-
-    
-  } catch (err) {
-    res.status(500).json({ status: "error", message: "Google login failed" });
-  }
-
+export const googleLogin = async (req: Request, res: Response) => {
+  console.log(req.body)
+  console.log(process.env.GOOGLE_CLIENT_ID)
   
-}
+  try {
+    const { credential } = req.body;
 
-export const getMe = (req: Request, res: Response) => {
-  res.json({ user: req.user });
+    if (!credential) {
+      return res.status(400).json({ message: "No Google credential provided" });
+    }
+
+    // Verify Google credential
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+
+    if (!payload) {
+      return res.status(401).json({ message: "Invalid Google token" });
+    }
+
+    const { email, name, picture, sub } = payload;
+
+    // Find or create user
+    let user = await Usermodel.findOne({ email });
+
+    if (!user) {
+      user = new Usermodel({
+        googleId: sub,
+        email,
+        userName: name,
+        avatar: picture,
+      });
+      await user.save();
+    }
+
+    // Create JWT
+    const token = generateToken({
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+    }); 
+
+    // Set HttpOnly cookie
+    const isProd = process.env.NODE_ENV === "production";  
+
+    res.cookie("auth_token", token, {
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? "none" : "lax",
+      path: "/",
+      maxAge:  60 * 1000,
+    });
+
+    // Return response
+    return res.json({
+      success: true,
+      user: user,
+    });
+
+  } catch (error) {
+    console.error("Google Login Error:", error);
+    return res.status(500).json({ success: false, message: "Login failed" });
+  }
 };
