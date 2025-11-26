@@ -10,12 +10,16 @@ export const googleAuthCallback =async(req:Request,res:Response)=>{
     try {
     const user = req.user as any; // Passport sets req.user
     const token = generateToken({ id: user._id, email: user.email, role: user.role ,avatar: user.avatar,});
-     res.cookie("auth_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    const isProd = process.env.NODE_ENV === "production";
+
+res.cookie("auth_token", token, {
+  httpOnly: true,
+  secure: isProd,                      // PROD → true, DEV → false
+  sameSite: isProd ? "none" : "lax",   // PROD → "none", DEV → "lax"
+  path: "/",
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+});
+
     // Redirect client with token
     res.redirect(`${process.env.CLIENT_URL}/auth/success`);
 
