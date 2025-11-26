@@ -58,7 +58,7 @@ export const googleLogin = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
-      domain: ".shidah.vercel.app",
+      domain: ".up.railway.app",
       path: "/",
       maxAge: 60 * 1000,
     });
