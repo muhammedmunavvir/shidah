@@ -58,10 +58,10 @@ export const googleLogin = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
-   domain: ".shidah.vercel.app",
+      domain: ".shidah.vercel.app",
       path: "/",
-      maxAge: 60 * 1000,
-    });
+      maxAge: 7 * 60 * 1000   // 1 minute
+    }); 
 
     // Return response
     return res.json({
