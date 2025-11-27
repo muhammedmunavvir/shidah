@@ -6,8 +6,8 @@ import Usermodel from "../models/usermodel";
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const googleLogin = async (req: Request, res: Response) => {
-  console.log(req.body);
-  console.log(process.env.GOOGLE_CLIENT_ID);
+  // console.log(req.body);
+  // console.log(process.env.GOOGLE_CLIENT_ID);
 
   try {
     const { credential } = req.body;
@@ -53,17 +53,17 @@ export const googleLogin = async (req: Request, res: Response) => {
 
     // Set HttpOnly cookie
     const isProd = process.env.NODE_ENV === "production";
-
+  console.log(token,"token");
+  
     res.cookie("auth_token", token, {
       httpOnly: true,
       secure: isProd,
       sameSite: isProd ? "none" : "lax",
-      domain: ".shidah.vercel.app",
-      path: "/",
       maxAge: 7 * 60 * 1000   // 1 minute
     }); 
 
     // Return response
+    // console.log(res.cookie.auth_token,"auth token")
     return res.json({
       success: true,
       user: user,

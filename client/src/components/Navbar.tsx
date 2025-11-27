@@ -1,5 +1,6 @@
 "use client";
-import { Search, ShoppingCart, User, Menu, X } from "lucide-react";
+
+import { Search, ShoppingCart, User, Menu, X, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,37 +16,51 @@ import { useAuthStore } from "@/store/useAuthstore";
 import { useCartStore } from "@/store/userCartstore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+
 export default function Navbar() {
+  // ---------- HOOKS (Always at top, no condition) ----------
+  const [mounted, setMounted] = useState(false);
+
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  const logout = useAuthStore((state) => state.logout);
+
   const { items, Getitem } = useCartStore();
 
-  const logout = useAuthStore((state) => state.logout);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Fetch cart when Navbar mounts
+  // ----------- MOUNT FIX -----------
   useEffect(() => {
-    if (user?._id) {
-      Getitem();
-    }
+    setMounted(true);
+  }, []);
+
+  // ----------- FETCH CART -----------
+  useEffect(() => {
+    if (user?._id) Getitem();
   }, [user, Getitem]);
 
+  // ----------- HANDLE SCROLL -----------
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 50) {
+      const scrollY = window.scrollY;
+
+      if (scrollY > 50) {
         setIsScrolled(true);
         setIsSearchOpen(false);
       } else {
         setIsScrolled(false);
       }
     };
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // ----------- BLOCK SSR CONTENT -----------
+  if (!mounted) return null;
 
   const navigationItems = [
     { name: "Products", href: "/allproducts" },
@@ -55,26 +70,17 @@ export default function Navbar() {
     { name: "Contact", href: "#" },
   ];
 
-  const handlelogin = () => {
-    router.push("/auth/googleauth");
-  };
-
-  const handleLogout = () => {
-    logout();
-  };
+  const handleLogin = () => router.push("/auth/googleauth");
 
   return (
     <nav
       style={{ borderWidth: "0 0.5px 0.5px 0.5px" }}
-      className={`sticky top-0 z-50 mx-auto bg-black/70 backdrop-blur-lg
-    border border-amber-300 rounded-lg
-    transition-all duration-300 ease-in-out
-    ${
-      isScrolled
-        ? "w-3/4 max-w-xl scale-90 py-1"
-        : "w-full rounded-none border-none scale-100 py-0"
-    }
-  `}
+      className={`
+        sticky top-0 z-50 mx-auto bg-black/70 backdrop-blur-lg
+        border border-amber-300 rounded-lg
+        transition-all duration-300 ease-in-out
+        ${isScrolled ? "w-3/4 max-w-xl scale-90 py-1" : "w-full rounded-none border-none scale-100 py-0"}
+      `}
     >
       <div className={`container mx-auto ${isScrolled ? "px-4" : "px-6"}`}>
         <div
@@ -82,13 +88,14 @@ export default function Navbar() {
             isScrolled ? "h-12" : "h-16"
           }`}
         >
-          {/* Logo - Shrinks when scrolled */}
+          {/* Logo */}
           <div className="flex items-center space-x-3 flex-shrink-0">
             <a href="#" className="flex items-center space-x-2">
               <div
-                className={`rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center ${
-                  isScrolled ? "h-6 w-6" : "h-8 w-8"
-                }`}
+                className={`
+                  rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center
+                  ${isScrolled ? "h-6 w-6" : "h-8 w-8"}
+                `}
               >
                 <span
                   className={`text-white font-bold ${
@@ -108,30 +115,33 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Desktop Navigation - Hidden when navbar is too small */}
+          {/* Desktop Navigation */}
           <div
-            className={`hidden md:flex items-center absolute left-1/2 transform -translate-x-1/2 ${
-              isScrolled ? "scale-90" : "scale-100"
-            }`}
+            className={`
+              hidden md:flex items-center absolute left-1/2 transform -translate-x-1/2
+              ${isScrolled ? "scale-90" : "scale-100"}
+            `}
           >
             <div className="flex items-center space-x-6">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`font-medium text-blue-500 hover:text-white relative group ${
-                    isScrolled ? "text-xs" : "text-sm"
-                  }`}
+                  className={`
+                    font-medium text-blue-500 hover:text-white relative group
+                    ${isScrolled ? "text-xs" : "text-sm"}
+                  `}
                 >
                   {item.name}
-                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300"></span>
+                  <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 group-hover:w-full transition-all duration-300" />
                 </Link>
               ))}
             </div>
           </div>
 
-          {/* Actions - Adjust spacing when scrolled */}
+          {/* Actions */}
           <div className="flex items-center space-x-3 flex-shrink-0">
+            {/* Theme Toggle */}
             <Button
               variant="ghost"
               size="icon"
@@ -144,7 +154,7 @@ export default function Navbar() {
               )}
             </Button>
 
-            {/* Search - Only show when not scrolled */}
+            {/* Desktop Search */}
             {!isScrolled && (
               <div className="hidden sm:flex items-center w-40 justify-end">
                 {isSearchOpen ? (
@@ -177,7 +187,7 @@ export default function Navbar() {
               </div>
             )}
 
-            {/* Mobile Search - Only show when not scrolled */}
+            {/* Mobile Search */}
             {!isScrolled && (
               <Button
                 variant="ghost"
@@ -189,7 +199,7 @@ export default function Navbar() {
             )}
 
             {/* Cart */}
-            {user ? (
+            {user && (
               <Button
                 variant="ghost"
                 size="icon"
@@ -199,19 +209,24 @@ export default function Navbar() {
                 onClick={() => router.push("/usercart")}
               >
                 <ShoppingCart
-                  className={`text-white ${isScrolled ? "h-4 w-4" : "h-5 w-5"}`}
+                  className={`text-white ${
+                    isScrolled ? "h-4 w-4" : "h-5 w-5"
+                  }`}
                 />
                 <span
-                  className={`absolute rounded-full bg-red-500 text-white flex items-center justify-center ${
-                    isScrolled
-                      ? "-top-1 -right-1 h-3 w-3 text-[8px]"
-                      : "-top-1 -right-1 h-4 w-4 text-[10px]"
-                  }`}
+                  className={`
+                    absolute rounded-full bg-red-500 text-white flex items-center justify-center
+                    ${
+                      isScrolled
+                        ? "-top-1 -right-1 h-3 w-3 text-[8px]"
+                        : "-top-1 -right-1 h-4 w-4 text-[10px]"
+                    }
+                  `}
                 >
                   {items.length}
                 </span>
               </Button>
-            ) : null}
+            )}
 
             {/* User Menu */}
             {user ? (
@@ -231,13 +246,13 @@ export default function Navbar() {
                     />
                   </Button>
                 </DropdownMenuTrigger>
+
                 <DropdownMenuContent align="end" className="w-44">
                   <DropdownMenuItem>
-                    {/* <User  className="mr-2 h-4 w-4" /> Profile */}
                     <img
-                    referrerPolicy="no-referrer"
+                      referrerPolicy="no-referrer"
                       src={user?.avatar || "/default-avatar.png"}
-                      alt="profile photo"
+                      alt="profile"
                       className="mr-2 h-7 w-7 rounded-full object-cover"
                     />
                     Profile
@@ -249,19 +264,20 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout}>
+                  <DropdownMenuItem onClick={logout}>
                     Sign out
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
               <button
-                className={`bg-gray-100 rounded-sm dark:text-black ${
-                  isScrolled ? "h-7 px-2 text-xs" : "h-8 px-3 text-sm"
-                }`}
-                onClick={handlelogin}
+                className={`
+                  bg-gray-100 rounded-sm dark:text-black
+                  ${isScrolled ? "h-7 px-2 text-xs" : "h-8 px-3 text-sm"}
+                `}
+                onClick={handleLogin}
               >
-                sign in
+                Sign in
               </button>
             )}
 
@@ -313,7 +329,7 @@ export default function Navbar() {
                     <Search className="mr-2 h-4 w-4" /> Search
                   </Button>
                   <Button variant="ghost" className="justify-start text-white">
-                    <ShoppingCart className="mr-2 h-4 w-4" /> Cart (2)
+                    <ShoppingCart className="mr-2 h-4 w-4" /> Cart ({items.length})
                   </Button>
                   <Button variant="ghost" className="justify-start text-white">
                     <User className="mr-2 h-4 w-4" /> Profile

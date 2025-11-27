@@ -10,6 +10,7 @@ interface RazorpayOptions {
   amount: number;
   name: string;
   description?: string;
+  currency: string;
   prefill?: {
     name?: string;
     email?: string;

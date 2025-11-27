@@ -6,6 +6,45 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Sparkles, ArrowRight, Star, ShoppingBag, Heart, Zap } from "lucide-react";
 
+function FloatingParticles() {
+  const [particles, setParticles] = useState<
+    { left: string; top: string; delay: string; duration: string }[]
+  >([]);
+
+  useEffect(() => {
+    const arr = [...Array(15)].map(() => ({
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      delay: `${Math.random() * 3}s`,
+      duration: `${2 + Math.random() * 3}s`,
+    }));
+    setParticles(arr);
+  }, []);
+
+  if (particles.length === 0) return null;
+
+  return (
+    <div className="absolute inset-0 pointer-events-none">
+      {particles.map((p, i) => (
+        <div
+          key={i}
+          className="absolute animate-pulse"
+          style={{
+            left: p.left,
+            top: p.top,
+            animationDelay: p.delay,
+            animationDuration: p.duration,
+          }}
+        >
+          <Star className="w-2 h-2 text-purple-300 opacity-20" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+
+
 export default function Heropage() {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -203,22 +242,7 @@ export default function Heropage() {
       </div>
 
       {/* Floating particles */}
-      <div className="absolute inset-0 pointer-events-none">
-        {[...Array(15)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute animate-pulse"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 3}s`,
-              animationDuration: `${2 + Math.random() * 3}s`,
-            }}
-          >
-            <Star className="w-2 h-2 text-purple-300 opacity-20" />
-          </div>
-        ))}
-      </div>
+      <FloatingParticles />
     </section>
   );
 }
