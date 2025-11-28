@@ -5,7 +5,8 @@
     "concurrently": "^9.2.0"
   },
    "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\" --host",
+
     "server": "npm run start:dev --prefix server",
     "client": "npm run dev --prefix client"
   }
