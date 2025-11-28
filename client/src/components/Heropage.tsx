@@ -2,28 +2,38 @@
 import { useState, useEffect } from "react"
 
 export default function MobileHero() {
-  const images = [
-    "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/6fdb79c4566bc82ed9d31cf0a09f351b_mkiztl.jpg",
-    "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/2854c5c5ba8afd211accd6b822f70e8c_vnnmcr.jpg",
-  ]
+ const slides = [
+  { type: "image", src: "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/6fdb79c4566bc82ed9d31cf0a09f351b_mkiztl.jpg" },
+  { type: "image", src: "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/2854c5c5ba8afd211accd6b822f70e8c_vnnmcr.jpg" },
+
+  // ⭐ Add your video here
+  { 
+    type: "video",
+    src: "https://res.cloudinary.com/dwypehszo/video/upload/v1764347956/From_KlickPin_CF_Libasekhas_UK_on_Instagram_Ramzan_Pret_Collection25Shop_Now_wwwlibasekhascouk_Tap_the_link_in_our_bio_We_Ship_Internationally_For_Inquiries_DM_us_anyti_Video_Video_nel_2025_xoa5wo.mp4" // replace with your video URL
+  },
+
+  { type: "image", src: "https://i.pinimg.com/1200x/4d/60/42/4d604214a5267a52af57ef24e8249e14.jpg" }
+];
+
 
   const [index, setIndex] = useState(0)
   const [touchStart, setTouchStart] = useState(0)
   const [touchEnd, setTouchEnd] = useState(0)
 
   useEffect(() => {
+      if (slides[index].type === "video") return;
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % images.length)
+      setIndex((prev) => (prev + 1) % slides.length)
     }, 5000)
     return () => clearInterval(interval)
-  }, [])
+  }, [index])
 
   // Swipe gesture handlers
-  const handleTouchStart = (e) => {
+  const handleTouchStart = (e:any) => {
     setTouchStart(e.targetTouches[0].clientX)
   }
 
-  const handleTouchMove = (e) => {
+  const handleTouchMove = (e:any) => {
     setTouchEnd(e.targetTouches[0].clientX)
   }
 
@@ -35,10 +45,10 @@ export default function MobileHero() {
     const isRightSwipe = distance < -50
 
     if (isLeftSwipe) {
-      setIndex((prev) => (prev + 1) % images.length)
+      setIndex((prev) => (prev + 1) % slides.length)
     }
     if (isRightSwipe) {
-      setIndex((prev) => (prev - 1 + images.length) % images.length)
+      setIndex((prev) => (prev - 1 + slides.length) % slides.length)
     }
   }
 
@@ -53,19 +63,27 @@ export default function MobileHero() {
         onTouchEnd={handleTouchEnd}
       >
         {/* Image with gradient overlay */}
-        <div className="absolute inset-0">
-          <img
-            src={images[index]}
-            alt="hero"
-            className="w-full h-full object-cover transition-all duration-700 scale-105"
-            style={{ objectPosition: '50% 30%' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/70"></div>
-        </div>
+        {slides[index].type === "image" ? (
+  <img
+    src={slides[index].src}
+    alt="hero"
+    className="w-full h-full object-cover transition-all duration-700 scale-105"
+    style={{ objectPosition: '50% 30%' }}
+  />
+) : (
+  <video
+    src={slides[index].src}
+    className="w-full h-full object-cover"
+    autoPlay
+    muted
+    playsInline
+     onEnded={() => setIndex((prev) => (prev + 1) % slides.length)} 
+  />
+)}
 
         {/* SLIDER INDICATORS - Top */}
         <div className="absolute top-5 left-0 right-0 flex justify-center gap-1.5 z-20">
-          {images.map((_, i) => (
+          {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setIndex(i)}
