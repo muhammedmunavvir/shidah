@@ -52,13 +52,13 @@ export const googleLogin = async (req: Request, res: Response) => {
     });
 
     // Set HttpOnly cookie
-    const isProd = process.env.NODE_ENV === "production";
-  console.log(token,"token");
+const isSecureContext = req.secure || req.headers['x-forwarded-proto'] === 'https';  console.log(token,"token");
   
     res.cookie("auth_token", token, {
+      domain: "shidah-production.up.railway.app",
       httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
+      secure: isSecureContext,
+      sameSite: "none" ,
       maxAge: 7 * 60 * 1000   // 1 minute
     }); 
 

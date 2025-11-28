@@ -19,9 +19,11 @@ const app = express();
 app.use(cors({
   origin: [
     "http://localhost:3000",
-    "https://shidah.vercel.app"   // replace after deployment
-  ],
-  credentials: true
+    "https://shidah.vercel.app",  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "Cookie"],
+  exposedHeaders: ["set-cookie"]
 }));
 
 app.use(express.json());
