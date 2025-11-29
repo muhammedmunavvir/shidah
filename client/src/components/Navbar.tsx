@@ -303,12 +303,14 @@ export default function Navbar() {
               <SheetContent
                 side="right"
                 className="
-  w-80 p-6 h-full overflow-y-auto tracking-wide
-  bg-white/20 dark:bg-white/10 
-  backdrop-blur-xl
-  border border-white/20 dark:border-white/10
-  shadow-[0_8px_32px_rgba(0,0,0,0.2)]
-  rounded-2xl
+                pointer-events-auto
+
+                w-80 p-6 h-full overflow-y-auto tracking-wide
+               bg-white/20 dark:bg-white/10 
+                 backdrop-blur-xl
+                border border-white/20 dark:border-white/10
+              shadow-[0_8px_32px_rgba(0,0,0,0.2)]
+             rounded-2xl
 "
               >
                 {/* Logo */}
@@ -325,13 +327,13 @@ export default function Navbar() {
                 {/* Navigation Items */}
                 <nav className="flex flex-col space-y-4">
                   {navigationItems.map((item) => (
-                    <a
+                    <Link
                       key={item.name}
                       href={item.href}
                       className="text-base font-medium text-white-400  "
                     >
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
                 </nav>
 
