@@ -1,6 +1,5 @@
 "use client";
 import { useState, useEffect } from "react";
-import AOS from "aos";
 import "aos/dist/aos.css";
 
 export default function MobileHero() {
@@ -28,14 +27,6 @@ export default function MobileHero() {
   const [touchEnd, setTouchEnd] = useState(0);
 
 
-   // Initialize AOS
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-      offset: 120,
-    });
-  }, []);
 
   useEffect(() => {
     if (slides[index].type === "video") return;
@@ -75,6 +66,7 @@ export default function MobileHero() {
           <img
             src={slides[index].src}
             className="w-full h-full object-cover"
+            data-aos="fade-left"
           />
         ) : (
           <video
@@ -102,7 +94,7 @@ export default function MobileHero() {
             New arrivals crafted with softness & grace.
           </p>
 
-          <button className="mt-4 w-full bg-black text-white dark:bg-white dark:text-black px-8 py-4 rounded-full uppercase text-sm">
+          <button className="mt-4 w-full bg-black text-white dark:bg-white dark:text-black px-8 py-4  uppercase text-sm">
             Shop Now
           </button>
         </div>

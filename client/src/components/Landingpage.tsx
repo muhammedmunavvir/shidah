@@ -13,23 +13,15 @@ import {
 } from "lucide-react";
 import PopupAd from "./PopupAd";
 
-// AOS IMPORTS
-import AOS from "aos";
 import "aos/dist/aos.css";
+import Link from "next/link";
 
 export default function Landingpage() {
   const [isVisible, setIsVisible] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [favorites, setFavorites] = useState(new Set<number>());
 
-  // Init AOS
-  useEffect(() => {
-    AOS.init({
-      duration: 800,
-      once: true,
-      offset: 100,
-    });
-  }, []);
+  
 
   useEffect(() => setIsVisible(true), []);
 
@@ -98,8 +90,8 @@ export default function Landingpage() {
     <section className="min-h-screen relative bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden">
 
       {/* Popup */}
-      {/* <div data-aos="zoom-in">
-        <PopupAd delay={2000} showOnce={false}>
+      <div >
+        <PopupAd delay={5000} showOnce={false}>
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-3 text-black dark:text-white">
               🔥 20% OFF Today!
@@ -112,7 +104,7 @@ export default function Landingpage() {
             </button>
           </div>
         </PopupAd>
-      </div> */}
+      </div>
 
       {/* Background Grid */}
       <div
@@ -262,12 +254,21 @@ export default function Landingpage() {
 
         {/* View All */}
         <div className="text-center mt-16" data-aos="fade-up">
-          <Button className="bg-black text-white dark:bg-white dark:text-black px-8 py-6 rounded-full hover:opacity-80 transition">
-            <ShoppingBag className="w-5 h-5 mr-2" />
-            View All Products
-            <ArrowRight className="w-5 h-5 ml-2" />
-          </Button>
-        </div>
+  <Link
+    href="/allproducts"
+    className="
+      inline-flex items-center justify-center
+      bg-black text-white dark:bg-white dark:text-black
+      px-8 py-4 
+      hover:opacity-80 transition
+    "
+  >
+    <ShoppingBag className="w-5 h-5 mr-2" />
+    View All Products
+    <ArrowRight className="w-5 h-5 ml-2" />
+  </Link>
+</div>
+
       </div>
     </section>
   );

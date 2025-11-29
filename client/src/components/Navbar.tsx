@@ -26,7 +26,6 @@ const playwrite = Playwrite_NO({
 
 export default function Navbar() {
   // ---------- HOOKS (Always at top, no condition) ----------
-  const [mounted, setMounted] = useState(false);
 
   const { theme, setTheme } = useTheme();
   const router = useRouter();
@@ -37,11 +36,6 @@ export default function Navbar() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
-  // ----------- MOUNT FIX -----------
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // ----------- FETCH CART -----------
   useEffect(() => {
@@ -66,7 +60,6 @@ export default function Navbar() {
   }, []);
 
   // ----------- BLOCK SSR CONTENT -----------
-  if (!mounted) return null;
 
   const navigationItems = [
     { name: "Products", href: "/allproducts" },
@@ -80,6 +73,7 @@ export default function Navbar() {
 
   return (
     <nav
+      suppressHydrationWarning
       style={{ borderWidth: "0 0.5px 0.5px 0.5px" }}
       className={`
         sticky top-0 z-50 mx-auto bg-white-50 dark:bg-black/70 backdrop-blur-lg
@@ -308,15 +302,25 @@ export default function Navbar() {
 
               <SheetContent
                 side="right"
-                className="w-80 p-6 h-full overflow-y-auto bg-black/90 text-white"
+                className="
+  w-80 p-6 h-full overflow-y-auto tracking-wide
+  bg-white/20 dark:bg-white/10 
+  backdrop-blur-xl
+  border border-white/20 dark:border-white/10
+  shadow-[0_8px_32px_rgba(0,0,0,0.2)]
+  rounded-2xl
+"
               >
                 {/* Logo */}
-                <div className="flex items-center space-x-2 mb-6">
-                  <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">S</span>
-                  </div>
-                  <span className="font-bold text-white text-lg">Shidah</span>
-                </div>
+                {/* <div className="flex items-center space-x-2 flex-shrink-0">
+                  <Link href="/" className="flex items-center">
+                    <div
+                      className={`${playwrite.className} text-xl font-semibold dark:text-white text-black`}
+                    >
+                      Shidah<span className="italic ml-1">.in</span>
+                    </div>
+                  </Link>
+                </div> */}
 
                 {/* Navigation Items */}
                 <nav className="flex flex-col space-y-4">
@@ -324,7 +328,7 @@ export default function Navbar() {
                     <a
                       key={item.name}
                       href={item.href}
-                      className="text-base font-medium text-fuchsia-400 hover:text-white transition-colors"
+                      className="text-base font-medium text-white-400  "
                     >
                       {item.name}
                     </a>
@@ -336,14 +340,14 @@ export default function Navbar() {
 
                 {/* Actions */}
                 <div className="flex flex-col space-y-4">
-                  <Button variant="ghost" className="justify-start text-white">
+                  <Button variant="ghost" className="justify-start text-black dark:text-white">
                     <Search className="mr-2 h-4 w-4" /> Search
                   </Button>
-                  <Button variant="ghost" className="justify-start text-white">
+                  <Button variant="ghost" className="justify-start text-black dark:text-white">
                     <ShoppingCart className="mr-2 h-4 w-4" /> Cart (
                     {items.length})
                   </Button>
-                  <Button variant="ghost" className="justify-start text-white">
+                  <Button variant="ghost" className="justify-start text-black dark:text-white">
                     <User className="mr-2 h-4 w-4" /> Profile
                   </Button>
                 </div>

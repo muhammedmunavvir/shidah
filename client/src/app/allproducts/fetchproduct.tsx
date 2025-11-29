@@ -1,240 +1,155 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useProductStore } from "@/store/useProductstore";
-import { Star, ShoppingBag, Heart } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Product } from "@/types/product";
+import { Star, Heart, ShoppingCart, Eye } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { Product } from "@/types/product";
 
 export default function Allproducts({ products }: { products: Product[] }) {
-  const { products: storeProducts, setProducts } = useProductStore();
+  const { setProducts } = useProductStore();
+
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState(new Set<string>());
 
   useEffect(() => {
-    if (products && products.length > 0) {
-      setProducts(products);
-    }
+    if (products?.length > 0) setProducts(products);
   }, [products, setProducts]);
+
+  const toggleFavorite = (id: string) => {
+    setFavorites((prev) => {
+      const updated = new Set(prev);
+      updated.has(id) ? updated.delete(id) : updated.add(id);
+      return updated;
+    });
+  };
 
   return (
     <>
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+      <section className="py-10 container mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-6 dark:text-white">All Products</h2>
+
+        {/* MATCHING LANDING PAGE GRID */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
           {products.map((p) => (
-            <Link key={p._id} href={`/product/${p._id}`} className="block">
-              <Card
-                key={p._id}
-                className="group overflow-hidden border border-gray-200 dark:border-gray-800 shadow-sm hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-900"
-              >
-                {/* Product Image */}
-                <div className="relative overflow-hidden">
-                  <img
-                    src={p.images[0] || "/placeholder.svg"}
-                    alt={p.name}
-                    className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
+            <div key={p._id} data-aos="fade-up">
+              <Link href={`/product/${p._id}`}>
+                <Card
+                  className="
+                    group cursor-pointer overflow-hidden rounded-none
+                    bg-white dark:bg-black/40 border border-black/10
+                    backdrop-blur-xl shadow-[0_0_15px_rgba(0,0,0,0.05)]
+                    dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]
+                    transition-all duration-300 hover:scale-[1.03]
+                  "
+                  onMouseEnter={() => setHovered(p._id)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  <CardContent className="p-3">
 
-                  {/* Badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-2">
-                    {p.badge && (
-                      <Badge
-                        variant="default"
-                        className="bg-blue-600 hover:bg-blue-700 text-white"
+                    {/* IMAGE LIKE LANDING PAGE */}
+                    <div className="relative overflow-hidden bg-black aspect-[3/4]">
+                      <img
+                        src={p.images[0]}
+                        alt={p.name}
+                        className="w-full h-full object-cover transition duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100"
+                      />
+
+                      {/* Overlay Buttons */}
+                      <div
+                        className={`
+                          absolute inset-0 flex items-center justify-center gap-2
+                          bg-black/60 backdrop-blur-sm transition-all duration-300
+                          ${hovered === p._id ? "opacity-100" : "opacity-0"}
+                        `}
                       >
-                        {p.badge}
-                      </Badge>
-                    )}
-                    {p.isBestSeller && (
-                      <Badge
-                        variant="secondary"
-                        className="bg-amber-500 text-white hover:bg-amber-600"
-                      >
-                        Best Seller
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8 bg-white/90 hover:bg-white dark:bg-gray-800/80 dark:hover:bg-gray-700"
-                    >
-                      <Heart className="h-4 w-4 dark:text-gray-200" />
-                    </Button>
-                    <Button
-                      size="icon"
-                      variant="secondary"
-                      className="h-8 w-8 bg-white/90 hover:bg-white dark:bg-gray-800/80 dark:hover:bg-gray-700"
-                    >
-                      <ShoppingBag className="h-4 w-4 dark:text-gray-200" />
-                    </Button>
-                  </div>
-
-                  {/* Stock Status Overlay */}
-                  {p.stock === 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <Badge variant="destructive" className="text-sm">
-                        Out of Stock
-                      </Badge>
-                    </div>
-                  )}
-                </div>
-
-                <CardContent className="p-3 space-y-2">
-                  {/* Product Name & Description */}
-                  <div className="space-y-1">
-                    <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                      {p.name}
-                    </h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-1">
-                      {p.description}
-                    </p>
-                  </div>
-
-                  {/* Ratings */}
-                  <div className="flex items-center gap-2">
-                    <div className="flex items-center">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <Star
-                          key={i}
-                          size={14}
-                          className={
-                            i < Math.round(p.ratings?.average ?? 0)
-                              ? "text-amber-400 fill-amber-400"
-                              : "text-gray-300 dark:text-gray-600"
-                          }
-                        />
-                      ))}
-                    </div>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      ({p.ratings?.count || 0})
-                    </span>
-                  </div>
-
-                  {/* Price */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xl font-bold text-green-600 dark:text-green-400">
-                      ₹{p.discountPrice}
-                    </span>
-                    {p.price !== p.discountPrice && (
-                      <>
-                        <span className="text-sm line-through text-gray-400 dark:text-gray-500">
-                          ₹{p.price}
-                        </span>
-                        <Badge variant="destructive" className="text-xs">
-                          {p.discount} OFF
-                        </Badge>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Colors */}
-                  {p.colors && p.colors.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Colors
-                      </h4>
-                      <div className="flex gap-2">
-                        {p.colors.slice(0, 4).map((c, index) => (
-                          <div
-                            key={c}
-                            className="w-6 h-6 rounded-full border-2 border-gray-200 dark:border-gray-700 cursor-pointer hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
-                            style={{ backgroundColor: c.toLowerCase() }}
-                            title={c}
-                          />
-                        ))}
-                        {p.colors.length > 4 && (
-                          <div className="w-6 h-6 rounded-full border-2 border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
-                            <span className="text-xs text-gray-600 dark:text-gray-400">
-                              +{p.colors.length - 4}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Sizes */}
-                  {p.sizes && p.sizes.length > 0 && (
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Sizes
-                      </h4>
-                      <div className="flex flex-wrap gap-1">
-                        {(p.sizes || []).slice(0, 4).map((s: any) => (
-                          <Badge
-                            key={s}
-                            variant="outline"
-                            className="text-xs hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-                          >
-                            {s}
-                          </Badge>
-                        ))}
-                        {p.sizes.length > 4 && (
-                          <Badge
-                            variant="outline"
-                            className="text-xs dark:border-gray-700"
-                          >
-                            +{p.sizes.length - 4}
-                          </Badge>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Tags */}
-                  {p.tags && p.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {p.tags.slice(0, 3).map((tag: any) => (
-                        <Badge
-                          key={tag}
-                          variant="secondary"
-                          className="text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-white/40 text-white bg-white/10 hover:bg-white/20"
                         >
-                          #{tag}
-                        </Badge>
-                      ))}
-                      {p.tags.length > 3 && (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+                          <Eye className="w-4 h-4 mr-1" /> View
+                        </Button>
+
+                        <Button
+                          size="sm"
+                          className="bg-white text-black hover:bg-gray-200"
                         >
-                          +{p.tags.length - 3}
-                        </Badge>
+                          <ShoppingCart className="w-4 h-4 mr-1" /> Cart
+                        </Button>
+                      </div>
+
+                      {/* Badge */}
+                      {p.badge && (
+                        <div className="absolute top-3 left-3 px-2 py-1 text-[10px] bg-white text-black rounded-full">
+                          {p.badge}
+                        </div>
                       )}
-                    </div>
-                  )}
 
-                  {/* Stock Info */}
-                  <div className="pt-2 border-t border-gray-100 dark:border-gray-800">
-                    <p
-                      className={`text-sm font-medium ${
-                        p.stock > 0
-                          ? p.stock < 10
-                            ? "text-amber-600"
-                            : "text-green-600 dark:text-green-400"
-                          : "text-red-600 dark:text-red-500"
-                      }`}
-                    >
-                      {p.stock > 0
-                        ? p.stock < 10
-                          ? `Only ${p.stock} left!`
-                          : `${p.stock} in stock`
-                        : "Out of stock"}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+                      {/* Discount */}
+                      {p.discount && (
+                        <div className="absolute top-3 right-3 px-2 py-1 text-[10px] bg-white text-black rounded-full">
+                          {p.discount}
+                        </div>
+                      )}
+
+                      {/* Favorite */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleFavorite(p._id);
+                        }}
+                        className="absolute bottom-3 right-3 p-2 rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30"
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${
+                            favorites.has(p._id)
+                              ? "text-red-500 fill-red-500"
+                              : "text-white"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* TEXT */}
+                    <div className="mt-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[11px] bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">
+                          {p.category}
+                        </span>
+
+                        <div className="flex items-center gap-1 text-xs">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                          {p.ratings?.average || 0}
+                        </div>
+                      </div>
+
+                      <h3 className="text-sm sm:text-base font-semibold dark:text-white">
+                        {p.name}
+                      </h3>
+
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-lg font-bold">₹{p.discountPrice}</span>
+                        {p.price !== p.discountPrice && (
+                          <span className="text-xs line-through text-gray-400">
+                            ₹{p.price}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+            </div>
           ))}
         </div>
-      </div>
+      </section>
     </>
   );
 }
