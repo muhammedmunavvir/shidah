@@ -1,184 +1,162 @@
-"use client"
-import { useState, useEffect } from "react"
+"use client";
+import { useState, useEffect } from "react";
+import AOS from "aos";
+import "aos/dist/aos.css";
 
 export default function MobileHero() {
- const slides = [
-  { type: "image", src: "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/6fdb79c4566bc82ed9d31cf0a09f351b_mkiztl.jpg" },
-  { type: "image", src: "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/2854c5c5ba8afd211accd6b822f70e8c_vnnmcr.jpg" },
+  const slides = [
+    {
+      type: "image",
+      src: "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/6fdb79c4566bc82ed9d31cf0a09f351b_mkiztl.jpg",
+    },
+    {
+      type: "image",
+      src: "https://res.cloudinary.com/dwypehszo/image/upload/v1764336123/2854c5c5ba8afd211accd6b822f70e8c_vnnmcr.jpg",
+    },
+    {
+      type: "video",
+      src: "https://res.cloudinary.com/dwypehszo/video/upload/v1764347956/From_KlickPin_CF_Libasekhas_UK_on_Instagram_Ramzan_Pret_Collection25Shop_Now_wwwlibasekhascouk_Tap_the_link_in_our_bio_We_Ship_Internationally_For_Inquiries_DM_us_anyti_Video_Video_nel_2025_xoa5wo.mp4",
+    },
+    {
+      type: "image",
+      src: "https://i.pinimg.com/1200x/4d/60/42/4d604214a5267a52af57ef24e8249e14.jpg",
+    },
+  ];
 
-  // ⭐ Add your video here
-  { 
-    type: "video",
-    src: "https://res.cloudinary.com/dwypehszo/video/upload/v1764347956/From_KlickPin_CF_Libasekhas_UK_on_Instagram_Ramzan_Pret_Collection25Shop_Now_wwwlibasekhascouk_Tap_the_link_in_our_bio_We_Ship_Internationally_For_Inquiries_DM_us_anyti_Video_Video_nel_2025_xoa5wo.mp4" // replace with your video URL
-  },
-
-  { type: "image", src: "https://i.pinimg.com/1200x/4d/60/42/4d604214a5267a52af57ef24e8249e14.jpg" }
-];
+  const [index, setIndex] = useState(0);
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
 
 
-  const [index, setIndex] = useState(0)
-  const [touchStart, setTouchStart] = useState(0)
-  const [touchEnd, setTouchEnd] = useState(0)
+   // Initialize AOS
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      once: true,
+      offset: 120,
+    });
+  }, []);
 
   useEffect(() => {
-      if (slides[index].type === "video") return;
+    if (slides[index].type === "video") return;
     const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(interval)
-  }, [index])
+      setIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [index]);
 
-  // Swipe gesture handlers
-  const handleTouchStart = (e:any) => {
-    setTouchStart(e.targetTouches[0].clientX)
-  }
+  const handleTouchStart = (e: any) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
 
-  const handleTouchMove = (e:any) => {
-    setTouchEnd(e.targetTouches[0].clientX)
-  }
+  const handleTouchMove = (e: any) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return
-    
-    const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > 50
-    const isRightSwipe = distance < -50
+    if (!touchStart || !touchEnd) return;
 
-    if (isLeftSwipe) {
-      setIndex((prev) => (prev + 1) % slides.length)
-    }
-    if (isRightSwipe) {
-      setIndex((prev) => (prev - 1 + slides.length) % slides.length)
-    }
-  }
+    const distance = touchStart - touchEnd;
+    if (distance > 50) setIndex((prev) => (prev + 1) % slides.length);
+    if (distance < -50) setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+  };
 
   return (
-    <section className="w-full bg-gradient-to-b from-neutral-50 to-white min-h-screen">
+    <section className="w-full bg-white text-black dark:bg-black dark:text-white">
 
-      {/* HERO IMAGE WITH SWIPE */}
-      <div 
-        className="relative w-full h-[70vh] max-h-[600px] overflow-hidden"
+      {/* MOBILE VERSION */}
+      <div
+        className="md:hidden relative w-full h-[80vh] overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Image with gradient overlay */}
         {slides[index].type === "image" ? (
-  <img
-    src={slides[index].src}
-    alt="hero"
-    className="w-full h-full object-cover transition-all duration-700 scale-105"
-    style={{ objectPosition: '50% 30%' }}
-  />
-) : (
-  <video
-    src={slides[index].src}
-    className="w-full h-full object-cover"
-    autoPlay
-    muted
-    playsInline
-     onEnded={() => setIndex((prev) => (prev + 1) % slides.length)} 
-  />
-)}
+          <img
+            src={slides[index].src}
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <video
+            src={slides[index].src}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            playsInline
+            onEnded={() => setIndex((prev) => (prev + 1) % slides.length)}
+          />
+        )}
 
-        {/* SLIDER INDICATORS - Top */}
-        <div className="absolute top-5 left-0 right-0 flex justify-center gap-1.5 z-20">
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setIndex(i)}
-              className={`h-0.5 rounded-full transition-all duration-300 ${
-                index === i ? "w-8 bg-white" : "w-6 bg-white/50"
-              }`}
-              aria-label={`Go to slide ${i + 1}`}
-            ></button>
-          ))}
-        </div>
-
-        {/* CONTENT OVERLAY */}
-        <div className="absolute inset-x-0 bottom-0 px-6 pb-10 z-10">
-          
-          {/* Small label */}
-          <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full">
+        <div className="absolute inset-x-0 bottom-0 px-6 pb-8 z-10 "data-aos="fade-up" >
+          <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-white/20 dark:bg-white/10 backdrop-blur-md rounded-full">
             <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span>
-            <span className="text-white text-xs font-medium tracking-wide uppercase">New Collection</span>
+            <span className="text-xs uppercase tracking-wide">New Collection</span>
           </div>
 
-          {/* Main heading */}
-          <h1 className="text-6xl sm:text-7xl font-serif font-light leading-[0.9] tracking-tight text-white mb-4">
-            Elegant<br />
-            <span className="italic text-amber-50">Pastels</span>
+          <h1 className="text-6xl leading-[0.9] font-serif font-light">
+            Elegant <br />
+            <span className="italic text-amber-400">Pastels</span>
           </h1>
 
-          {/* Description */}
-          <p className="text-white/90 text-base sm:text-lg font-light mb-6 max-w-xs leading-relaxed">
+          <p className="text-black/80 dark:text-white/80 text-sm mt-3">
+            New arrivals crafted with softness & grace.
+          </p>
+
+          <button className="mt-4 w-full bg-black text-white dark:bg-white dark:text-black px-8 py-4 rounded-full uppercase text-sm">
+            Shop Now
+          </button>
+        </div>
+      </div>
+
+
+      {/* DESKTOP VERSION */}
+      <div className="hidden md:grid grid-cols-2 h-screen">
+
+        {/* LEFT TEXT */}
+        <div className="flex flex-col justify-center px-20" data-aos="fade-right">
+          <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 bg-black/10 dark:bg-white/10 rounded-full w-36">
+            <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
+            <span className="text-xs uppercase tracking-wide">New Collection</span>
+          </div>
+
+          <h1 className="text-7xl font-serif leading-[0.9]">
+            Elegant <br />
+            <span className="italic text-amber-300">Pastels</span>
+          </h1>
+
+          <p className="text-gray-600 dark:text-gray-300 text-lg mt-4 max-w-md">
             New arrivals crafted with softness & grace for the modern soul.
           </p>
 
-          {/* CTA Button */}
-          <button className="w-full sm:w-auto px-8 py-4 bg-white text-black rounded-full text-sm font-medium tracking-wide uppercase shadow-xl hover:bg-neutral-100 active:scale-95 transition-all duration-200">
+          <button className="mt-6 w-fit px-10 py-4 bg-black text-white dark:bg-white dark:text-black rounded-full uppercase text-sm">
             Shop Now
           </button>
         </div>
 
-        {/* Swipe hint (disappears after first interaction) */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10">
-          <svg className="w-8 h-8 text-white/40 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-          </svg>
-        </div>
-      </div>
+        {/* RIGHT IMAGE/VIDEO */}
+        <div className="flex items-center justify-end pr-10" data-aos="fade-left">
+          <div className="w-[70%] h-[500px] rounded-xl overflow-hidden shadow-2xl flex items-center justify-center bg-black/10 dark:bg-black">
 
-      {/* SECTION HEADER */}
-      <div className="px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight text-gray-900">New Arrivals</h2>
-            <p className="text-gray-500 text-sm mt-1">
-              Carefully crafted modern ethnic fashion
-            </p>
+            {slides[index].type === "image" ? (
+              <img
+                src={slides[index].src}
+                className="max-w-full max-h-full object-contain rounded-2xl"
+              />
+            ) : (
+              <video
+                src={slides[index].src}
+                className="max-w-full max-h-full object-contain"
+                autoPlay
+                muted
+                playsInline
+                onEnded={() => setIndex((prev) => (prev + 1) % slides.length)}
+              />
+            )}
+
           </div>
-          <button className="text-sm font-medium text-gray-900 underline underline-offset-4">
-            View All
-          </button>
         </div>
 
-        {/* CATEGORY CHIPS */}
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {['All', 'Dresses', 'Tops', 'Bottoms', 'Accessories'].map((cat) => (
-            <button
-              key={cat}
-              className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all ${
-                cat === 'All' 
-                  ? 'bg-black text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
       </div>
-
-      {/* FEATURE HIGHLIGHTS */}
-      <div className="grid grid-cols-3 gap-px bg-gray-200 mx-6 mb-8 rounded-2xl overflow-hidden shadow-sm">
-        <div className="bg-white p-4 text-center">
-          <div className="text-2xl mb-1">🚚</div>
-          <p className="text-xs font-medium text-gray-900">Free Ship</p>
-          <p className="text-[10px] text-gray-500">Over ₹999</p>
-        </div>
-        <div className="bg-white p-4 text-center">
-          <div className="text-2xl mb-1">↩️</div>
-          <p className="text-xs font-medium text-gray-900">Easy Return</p>
-          <p className="text-[10px] text-gray-500">30 Days</p>
-        </div>
-        <div className="bg-white p-4 text-center">
-          <div className="text-2xl mb-1">✨</div>
-          <p className="text-xs font-medium text-gray-900">Premium</p>
-          <p className="text-[10px] text-gray-500">Quality</p>
-        </div>
-      </div>
-
     </section>
-  )
+  );
 }

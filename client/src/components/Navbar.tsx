@@ -17,6 +17,12 @@ import { useCartStore } from "@/store/userCartstore";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
+import { Playwrite_NO } from "next/font/google";
+
+const playwrite = Playwrite_NO({
+  style: ["normal"],
+  weight: ["400"], // adjust if you want 500/700
+});
 
 export default function Navbar() {
   // ---------- HOOKS (Always at top, no condition) ----------
@@ -76,10 +82,14 @@ export default function Navbar() {
     <nav
       style={{ borderWidth: "0 0.5px 0.5px 0.5px" }}
       className={`
-        sticky top-0 z-50 mx-auto bg-black/70 backdrop-blur-lg
+        sticky top-0 z-50 mx-auto bg-white-50 dark:bg-black/70 backdrop-blur-lg
         border border-amber-300 rounded-lg
         transition-all duration-300 ease-in-out
-        ${isScrolled ? "w-3/4 max-w-xl scale-90 py-1" : "w-full rounded-none border-none scale-100 py-0"}
+        ${
+          isScrolled
+            ? "w-3/4 max-w-xl scale-90 py-1"
+            : "w-full rounded-none border-none scale-100 py-0"
+        }
       `}
     >
       <div className={`container mx-auto ${isScrolled ? "px-4" : "px-6"}`}>
@@ -89,30 +99,35 @@ export default function Navbar() {
           }`}
         >
           {/* Logo */}
-          <div className="flex items-center space-x-3 flex-shrink-0">
-            <a href="#" className="flex items-center space-x-2">
+          {/* <div className="flex items-center space-x-3 flex-shrink-0">
+            <Link href="/" className="flex items-center space-x-2">
+              {/* image container must be relative for next/image fill 
               <div
-                className={`
-                  rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center
+                className={`relative overflow-hidden rounded-md flex items-center justify-center
                   ${isScrolled ? "h-6 w-6" : "h-8 w-8"}
                 `}
+                aria-hidden={false}
               >
-                <span
-                  className={`text-white font-bold ${
-                    isScrolled ? "text-xs" : "text-sm"
-                  }`}
-                >
-                  S
-                </span>
+                <img
+                  src="https://res.cloudinary.com/dwypehszo/image/upload/v1764398757/Group_1_qnswwg.jpg"
+                  alt="Shidah logo"
+                  sizes={isScrolled ? "24px" : "32px"}
+                  className="object-contain"
+                  
+                />
               </div>
-              <span
-                className={`font-bold text-white ${
-                  isScrolled ? "text-sm" : "text-base"
-                }`}
+
+            </Link>
+          </div> */}
+
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            <Link href="/" className="flex items-center">
+              <div
+                className={`${playwrite.className} text-xl font-semibold dark:text-white text-black`}
               >
-                Shidah
-              </span>
-            </a>
+                Shidah<span className="italic ml-1">.in</span>
+              </div>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -209,9 +224,7 @@ export default function Navbar() {
                 onClick={() => router.push("/usercart")}
               >
                 <ShoppingCart
-                  className={`text-white ${
-                    isScrolled ? "h-4 w-4" : "h-5 w-5"
-                  }`}
+                  className={`text-white ${isScrolled ? "h-4 w-4" : "h-5 w-5"}`}
                 />
                 <span
                   className={`
@@ -264,9 +277,7 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                    Sign out
-                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
@@ -329,7 +340,8 @@ export default function Navbar() {
                     <Search className="mr-2 h-4 w-4" /> Search
                   </Button>
                   <Button variant="ghost" className="justify-start text-white">
-                    <ShoppingCart className="mr-2 h-4 w-4" /> Cart ({items.length})
+                    <ShoppingCart className="mr-2 h-4 w-4" /> Cart (
+                    {items.length})
                   </Button>
                   <Button variant="ghost" className="justify-start text-white">
                     <User className="mr-2 h-4 w-4" /> Profile
