@@ -28,7 +28,7 @@ export const googleLogin = async (req: Request, res: Response) => {
       return res.status(401).json({ message: "Invalid Google token" });
     }
 
-    const { email, name, picture, sub } = payload; 
+    const { email, name, picture, sub } = payload;
 
     // Find or create user
     let user = await Usermodel.findOne({ email });
@@ -73,5 +73,3 @@ const isSecureContext = req.secure || req.headers['x-forwarded-proto'] === 'http
     return res.status(500).json({ success: false, message: "Login failed" });
   }
 };
-
-
