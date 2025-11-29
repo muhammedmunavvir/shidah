@@ -312,7 +312,7 @@ export default function Navbar() {
               shadow-[0_8px_32px_rgba(0,0,0,0.2)]
              rounded-2xl
 "
-              >
+              > 
                 {/* Logo */}
                 {/* <div className="flex items-center space-x-2 flex-shrink-0">
                   <Link href="/" className="flex items-center">
