@@ -9,18 +9,37 @@ const api = axios.create({
 
 export default api;
 
-
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    // if (error.response?.status === 401) {
-    //   console.log(error.response,"error.response")
-    //   toast.error("Your session has expired. Please log in again.");
-    //   // JWT expired or invalid
-    //   const { logout } = useAuthStore.getState();
-    //   logout();
-    //   window.location.href = "/auth/googleauth";
-    // }
+  async (error) => {
+    const originalRequest = error.config;
+
+    // Handle token errors
+    if (
+      (error.response?.data?.message === "TOKEN_EXPIRED" ||
+       error.response?.data?.message === "INVALID_TOKEN" ||
+       error.response?.data?.message === "NO_TOKEN") &&
+      !originalRequest._retry
+    ) {
+
+      originalRequest._retry = true;
+
+      try {
+        // must match backend route!!!
+        await api.post("/auth/refresh");
+
+        return api(originalRequest);
+      } catch (refreshError) {
+        console.error("Refresh failed:", refreshError);
+
+        const { logout } = useAuthStore.getState();
+        logout();
+
+        window.location.href = "/auth/googleauth";
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
   }
 );

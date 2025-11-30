@@ -2,7 +2,7 @@ import { verifyToken } from "../util/jwt";
 
 export const jwtverification = (req, res, next) => {
 const token = req.cookies.auth_token; 
-    console.log(token)
+console.log("jwt middleware hit:", token);
 
   if (!token) return res.status(401).json({ message: "NO_TOKEN" });
 

@@ -46,6 +46,12 @@ export default function RootLayout({
                 src="https://checkout.razorpay.com/v1/checkout.js"
                 strategy="afterInteractive"
               />
+              <script
+                src="https://accounts.google.com/gsi/client"
+                async
+                defer
+                id="google-auth-script"
+              ></script>
             </ReactQueryProvider>
           </ThemeProvider>
         </AOSProvider>

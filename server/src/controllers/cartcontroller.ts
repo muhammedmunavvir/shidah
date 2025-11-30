@@ -17,8 +17,7 @@ export const Getcartcontroller = async (req: Request, res: Response) => {
 };
 
 export const addtocart = async (req: Request, res: Response) => {
-  console.log(req.body);
-  
+   
   try {
     const { productId, qty, userId } = req.body;
 

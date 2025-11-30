@@ -1,5 +1,5 @@
 import jwt, { SignOptions, Secret } from "jsonwebtoken";
-import { JwtPayload } from "../types/auth.type.js";
+import { TokenPayload } from "../types/auth.type.js";
 import dotenv from "dotenv";
 import type { StringValue } from "ms"; 
 dotenv.config();
@@ -14,13 +14,13 @@ const getJwtSecret = (): Secret => {
 
 // Explicitly type expiresIn as ms.StringValue
 export const generateToken = (
-  payload: JwtPayload,
+  payload: TokenPayload,
   expiresIn: StringValue = "7d"
 ): string => {
   const options: SignOptions = { expiresIn };
   return jwt.sign(payload, getJwtSecret(), options);
 };
 
-export const verifyToken = (token: string): JwtPayload => {
-  return jwt.verify(token, getJwtSecret()) as JwtPayload;
+export const verifyToken = (token: string): TokenPayload => {
+  return jwt.verify(token, getJwtSecret()) as TokenPayload;
 };

@@ -201,7 +201,7 @@ export default function Navbar() {
               <Button
                 variant="ghost"
                 size="icon"
-                className="sm:hidden h-10 w-10 text-white hover:bg-white/10"
+                className="hidden"
               >
                 <Search className="h-5 w-5" />
               </Button>

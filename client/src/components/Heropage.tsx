@@ -26,8 +26,6 @@ export default function MobileHero() {
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
 
-
-
   useEffect(() => {
     if (slides[index].type === "video") return;
     const interval = setInterval(() => {
@@ -49,12 +47,12 @@ export default function MobileHero() {
 
     const distance = touchStart - touchEnd;
     if (distance > 50) setIndex((prev) => (prev + 1) % slides.length);
-    if (distance < -50) setIndex((prev) => (prev - 1 + slides.length) % slides.length);
+    if (distance < -50)
+      setIndex((prev) => (prev - 1 + slides.length) % slides.length);
   };
 
   return (
     <section className="w-full bg-white text-black dark:bg-black dark:text-white">
-
       {/* MOBILE VERSION */}
       <div
         className="md:hidden relative w-full h-[80vh] overflow-hidden"
@@ -79,10 +77,15 @@ export default function MobileHero() {
           />
         )}
 
-        <div className="absolute inset-x-0 bottom-0 px-6 pb-8 z-10 "data-aos="fade-up" >
+        <div
+          className="absolute inset-x-0 bottom-0 px-6 pb-8 z-10 "
+          data-aos="fade-up"
+        >
           <div className="inline-flex items-center gap-2 mb-3 px-3 py-1.5 bg-white/20 dark:bg-white/10 backdrop-blur-md rounded-full">
             <span className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse"></span>
-            <span className="text-xs uppercase tracking-wide">New Collection</span>
+            <span className="text-xs uppercase tracking-wide">
+              New Collection
+            </span>
           </div>
 
           <h1 className="text-6xl leading-[0.9] font-serif font-light">
@@ -100,15 +103,18 @@ export default function MobileHero() {
         </div>
       </div>
 
-
       {/* DESKTOP VERSION */}
       <div className="hidden md:grid grid-cols-2 h-screen">
-
         {/* LEFT TEXT */}
-        <div className="flex flex-col justify-center px-20" data-aos="fade-right">
+        <div
+          className="flex flex-col justify-center px-20"
+          data-aos="fade-right"
+        >
           <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 bg-black/10 dark:bg-white/10 rounded-full w-36">
             <span className="w-1.5 h-1.5 bg-amber-400 rounded-full"></span>
-            <span className="text-xs uppercase tracking-wide">New Collection</span>
+            <span className="text-xs uppercase tracking-wide">
+              New Collection
+            </span>
           </div>
 
           <h1 className="text-7xl font-serif leading-[0.9]">
@@ -120,15 +126,17 @@ export default function MobileHero() {
             New arrivals crafted with softness & grace for the modern soul.
           </p>
 
-          <button className="mt-6 w-fit px-10 py-4 bg-black text-white dark:bg-white dark:text-black rounded-full uppercase text-sm">
-            Shop Now
+          <button className="mt-6 w-fit px-10 py-4 bg-black text-white dark:bg-white dark:text-black hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white uppercase text-sm transition-colors duration-200">
+            shope now
           </button>
         </div>
 
         {/* RIGHT IMAGE/VIDEO */}
-        <div className="flex items-center justify-end pr-10" data-aos="fade-left">
+        <div
+          className="flex items-center justify-end pr-10"
+          data-aos="fade-left"
+        >
           <div className="w-[70%] h-[500px] rounded-xl overflow-hidden shadow-2xl flex items-center justify-center bg-black/10 dark:bg-black">
-
             {slides[index].type === "image" ? (
               <img
                 src={slides[index].src}
@@ -137,17 +145,15 @@ export default function MobileHero() {
             ) : (
               <video
                 src={slides[index].src}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-full max-h-full object-contain rounded-2xl"
                 autoPlay
                 muted
                 playsInline
                 onEnded={() => setIndex((prev) => (prev + 1) % slides.length)}
               />
             )}
-
           </div>
         </div>
-
       </div>
     </section>
   );

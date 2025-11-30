@@ -8,7 +8,13 @@ export interface JwtPayload {
   id: string;
   email: string;
   role: string;
+  avatar?: string;
   iat?: number;
   exp?: number;
-  avatar: string,
 }
+
+export interface RefreshTokenPayload {
+  id: string;
+}
+
+export type TokenPayload = JwtPayload | RefreshTokenPayload;

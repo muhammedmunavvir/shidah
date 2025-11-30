@@ -43,25 +43,35 @@ export const googleLogin = async (req: Request, res: Response) => {
       await user.save();
     }
 
-    // Create JWT
-    const token = generateToken({
-      id: user._id,
-      email: user.email,
-      role: user.role,
-      avatar: user.avatar,
-    });
+     const accessToken = generateToken(
+      { id: user._id, email: user.email, role: user.role },
+      "15m"   
+    );
+
+    const refreshToken = generateToken(
+      { id: user._id },
+      "7d"     // refresh token → 7 days
+    );
+
 
     // Set HttpOnly cookie
-const isSecureContext = req.secure || req.headers['x-forwarded-proto'] === 'https';  console.log(token,"token");
-  
-    res.cookie("auth_token", token, {
-      domain: "shidah-production.up.railway.app",
-      httpOnly: true,
-      secure: isSecureContext,
-      sameSite: "none" ,
-      maxAge: 7 * 60 * 1000   // 1 minute
-    }); 
+    const isProduction = process.env.NODE_ENV === "production";
 
+    // Set Access Token cookie
+    res.cookie("auth_token", accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 5 * 60 * 1000, // 5 minutes for testring
+    });
+ 
+    // Set Refresh Token cookie
+    res.cookie("refresh_token", refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+    });
     // Return response
     // console.log(res.cookie.auth_token,"auth token")
     return res.json({
@@ -73,3 +83,8 @@ const isSecureContext = req.secure || req.headers['x-forwarded-proto'] === 'http
     return res.status(500).json({ success: false, message: "Login failed" });
   }
 };
+
+
+
+
+ 
