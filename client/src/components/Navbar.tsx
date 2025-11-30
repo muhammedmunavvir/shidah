@@ -18,6 +18,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Playwrite_NO } from "next/font/google";
+import { useAuthInit } from "@/hooks/useAuthInit";
 
 const playwrite = Playwrite_NO({
   style: ["normal"],
@@ -25,6 +26,7 @@ const playwrite = Playwrite_NO({
 });
 
 export default function Navbar() {
+  useAuthInit()
   // ---------- HOOKS (Always at top, no condition) ----------
 
   const { theme, setTheme } = useTheme();

@@ -62,7 +62,7 @@ export const googleLogin = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
-      maxAge: 5 * 60 * 1000, // 5 minutes for testring
+      maxAge: 5 * 60 * 1000,
     });
  
     // Set Refresh Token cookie
