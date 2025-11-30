@@ -7,10 +7,6 @@ export function useAuthInit() {
   const setUser = useAuthStore((state) => state.setUser);
 
   useEffect(() => {
-    // If no auth cookie exists → don't call the API
-    const hasToken = document.cookie.includes("auth_token");
-    if (!hasToken) return;
-
     async function init() {
       try {
         const res = await api.get("/auth/userInfo");
