@@ -13,29 +13,32 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const message = error.response?.data?.message;
 
-    // Handle token errors  
+    // ❌ Ignore NO_TOKEN — means user is not logged in
+    if (message === "NO_TOKEN") {
+      return Promise.reject(error); // no refresh, no logout, no toast
+    }
+
+    // Refresh only for expired/invalid tokens
     if (
-      (error.response?.data?.message === "TOKEN_EXPIRED" ||
-       error.response?.data?.message === "INVALID_TOKEN" ||
-       error.response?.data?.message === "NO_TOKEN") &&
+      (message === "TOKEN_EXPIRED" || message === "INVALID_TOKEN") &&
       !originalRequest._retry
     ) {
-
       originalRequest._retry = true;
 
       try {
-        // must match backend route!!!
         await api.post("/auth/refresh");
-
         return api(originalRequest);
       } catch (refreshError) {
         console.error("Refresh failed:", refreshError);
-       toast("refresh token expire after 7 days , pls login again")
+
         const { logout } = useAuthStore.getState();
         logout();
 
-        // window.location.href = "/auth/googleauth";
+        toast("Session expired. Please login again");
+
+        // no redirect
         return Promise.reject(refreshError);
       }
     }
