@@ -35,7 +35,7 @@ api.interceptors.response.use(
         const { logout } = useAuthStore.getState();
         logout();
 
-        window.location.href = "/auth/googleauth";
+        // window.location.href = "/auth/googleauth";
         return Promise.reject(refreshError);
       }
     }
