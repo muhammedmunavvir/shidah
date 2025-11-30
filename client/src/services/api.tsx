@@ -36,7 +36,7 @@ api.interceptors.response.use(
         const { logout } = useAuthStore.getState();
         logout();
 
-        toast("Session expired. Please login again");
+        // toast("Session expired. Please login again");
 
         // no redirect
         return Promise.reject(refreshError);
