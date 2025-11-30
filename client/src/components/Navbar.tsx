@@ -19,19 +19,20 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Playwrite_NO } from "next/font/google";
 import { useAuthInit } from "@/hooks/useAuthInit";
+import { logoutapi } from "@/api/logout";
 
 const playwrite = Playwrite_NO({
   style: ["normal"],
-  weight: ["400"], // adjust if you want 500/700
+  weight: ["400"], 
 });
 
 export default function Navbar() {
   useAuthInit()
-  // ---------- HOOKS (Always at top, no condition) ----------
 
   const { theme, setTheme } = useTheme();
   const router = useRouter();
   const user = useAuthStore((state) => state.user);
+  console.log(user,"user")
   const logout = useAuthStore((state) => state.logout);
 
   const { items, Getitem } = useCartStore();
@@ -39,12 +40,10 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // ----------- FETCH CART -----------
   useEffect(() => {
     if (user?._id) Getitem();
   }, [user, Getitem]);
 
-  // ----------- HANDLE SCROLL -----------
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -61,7 +60,6 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ----------- BLOCK SSR CONTENT -----------
 
   const navigationItems = [
     { name: "Products", href: "/allproducts" },
@@ -72,6 +70,19 @@ export default function Navbar() {
   ];
 
   const handleLogin = () => router.push("/auth/googleauth");
+
+
+
+
+async function handleLogout() {
+  try {
+    await logoutapi();  
+    logout();          
+  } catch (error) {
+    console.log("Logout error:", error);
+  }
+}
+
 
   return (
     <nav
@@ -273,7 +284,7 @@ export default function Navbar() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>Sign out</DropdownMenuItem>
+                  <DropdownMenuItem onClick={handleLogout}>Sign out</DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
