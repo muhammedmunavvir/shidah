@@ -1,35 +1,50 @@
+import Usermodel from "../models/usermodel";
 import { generateToken, verifyToken } from "../util/jwt";
 import { Request,Response } from "express";
-export const refreshAccessToken = (req:Request, res:Response) => {
-    console.log("refresh token triggerd")
-    
-    const refreshToken = req.cookies.refresh_token;
-    console.log(refreshToken,"refrsh token")
+export const refreshAccessToken = async (req: Request, res: Response) => {
+  console.log("refresh token triggered");
+  
+  const refreshToken = req.cookies.refresh_token;
 
   if (!refreshToken) {
     return res.status(401).json({ message: "NO_REFRESH_TOKEN" });
   }
 
   try {
-    // Verify refresh token (only contains user id)
-    const decoded = verifyToken(refreshToken);
+    const decoded = verifyToken(refreshToken); // only contains _id
+
+    // 1️⃣ Fetch user from DB
+    const user = await Usermodel.findById(decoded._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "USER_NOT_FOUND" });
+    }
 
     const isProduction = process.env.NODE_ENV === "production";
 
-    // Generate new access token
+    // 2️⃣ Generate new access token with FULL payload
     const newAccessToken = generateToken(
-      { _id: decoded._id },
+      {
+        _id: user._id,
+        email: user.email,
+        role: user.role,
+      },
       "15m"
     );
 
+    // 3️⃣ Set new cookie
     res.cookie("auth_token", newAccessToken, {
       httpOnly: true,
       secure: isProduction,
       sameSite: isProduction ? "none" : "lax",
-      maxAge: 7 * 60 * 1000, // 15 min
+      maxAge: 15 * 60 * 1000,
     });
 
-    return res.json({ success: true });
+    // 4️⃣ Return updated user
+    return res.json({
+      success: true,
+      user,
+    });
 
   } catch (err) {
     return res.status(403).json({ message: "INVALID_REFRESH_TOKEN" });

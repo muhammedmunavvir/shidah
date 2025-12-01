@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/userCartstore";
 export default function Productdetails({ product }: { product: Product }) {
   const { user } = useAuthStore();
-  console.log(user)
+  console.log(user,"proddetial")
   const { addItem } = useCartStore();
   return (
     <>

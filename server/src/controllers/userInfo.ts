@@ -1,18 +1,27 @@
+import Usermodel from "../models/usermodel";
 import { verifyToken } from "../util/jwt";
 
-export const getUserInfo = (req, res) => {
-  const accessToken = req.cookies.auth_token;
+export const getUserInfo = async (req, res) => {
+  const token = req.cookies.auth_token;
 
-  if (!accessToken) {
+  if (!token) {
     return res.status(401).json({ message: "NO_TOKEN" });
   }
 
   try {
-    const decoded = verifyToken(accessToken);
+    // Decode token to get user ID
+    const decoded = verifyToken(token);
+
+    // Fetch full user from DB
+    const user = await Usermodel.findById(decoded._id);
+
+    if (!user) {
+      return res.status(404).json({ message: "USER_NOT_FOUND" });
+    }
 
     return res.json({
       success: true,
-      user: decoded,   // id, email, role
+      user, // FULL user from MongoDB
     });
 
   } catch (err) {
