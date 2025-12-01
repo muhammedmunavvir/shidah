@@ -61,7 +61,7 @@ export const googleLogin = async (req: Request, res: Response) => {
       httpOnly: true,
       secure: true,
       sameSite: "none" ,
-      maxAge: 5 * 60 * 1000,
+      maxAge: 15 * 60 * 1000,
     });
  
     // Set Refresh Token cookie

@@ -28,7 +28,7 @@ export const refreshAccessToken = async (req: Request, res: Response) => {
         email: user.email,
         role: user.role,
       },
-      "15m"
+      "5m"
     );
 
     // 3️⃣ Set new cookie

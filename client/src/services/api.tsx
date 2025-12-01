@@ -22,7 +22,7 @@ api.interceptors.response.use(
 
     // Refresh only for expired/invalid tokens
     if (
-      (message === "TOKEN_EXPIRED" || message === "INVALID_TOKEN") &&
+      (message === "TOKEN_EXPIRED" || message === "INVALID_TOKEN"||message==="NO_TOKEN") &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
