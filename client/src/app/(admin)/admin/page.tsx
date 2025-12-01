@@ -21,12 +21,19 @@ export default function DashboardPage() {
   const router = useRouter();
   const { user ,hydrated} = useAuthStore();
   console.log(user?.role,"user .role in admin page.tsx")
- useEffect(() => {
-    if (!hydrated) return; // wait until Zustand store is ready
-    if (!user || user.role !== "admin") {
-      router.replace("/");
-    }
-  }, [hydrated, user, router]);
+useEffect(() => {
+  if (!hydrated) return;
+
+  if (!user) {
+    router.replace("/auth/googleauth");
+    return;
+  }
+
+  if (user.role !== "admin") {
+    router.replace("/");
+  }
+}, [hydrated, user, router]);
+
 
   if(!hydrated){
     return (

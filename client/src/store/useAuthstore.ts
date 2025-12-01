@@ -9,16 +9,19 @@ interface User {
 
 interface AuthState {
   user: User | null;
+  hydrated: boolean;
   loading: boolean;
   setUser: (user: User | null) => void;
   logout: () => void;
+  setHydrated: (v: boolean) => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
-
+  hydrated: false,
   setUser: (user) => set({ user }),
+  setHydrated: (v) => set({ hydrated: v }),
 
   logout: () => {
     set({ user: null, loading: false });

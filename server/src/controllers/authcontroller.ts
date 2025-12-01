@@ -55,21 +55,20 @@ export const googleLogin = async (req: Request, res: Response) => {
 
 
     // Set HttpOnly cookie
-    const isProduction = process.env.NODE_ENV === "production";
 
     // Set Access Token cookie
     res.cookie("auth_token", accessToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: true,
+      sameSite: "none" ,
       maxAge: 5 * 60 * 1000,
     });
  
     // Set Refresh Token cookie
     res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
-      secure: isProduction,
-      sameSite: isProduction ? "none" : "lax",
+      secure: true,
+      sameSite: "none" ,
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
     // Return response

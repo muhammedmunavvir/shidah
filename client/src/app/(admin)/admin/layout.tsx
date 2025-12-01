@@ -5,8 +5,10 @@ import { usePathname, useRouter } from "next/navigation";
 import { LayoutDashboard, Users, Package, Settings, LogOut, Boxes, Menu } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthstore";
 import { useEffect, useState } from "react";
+import { useAuthInit } from "@/hooks/useAuthInit";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
+   useAuthInit();
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout, hydrated } = useAuthStore();

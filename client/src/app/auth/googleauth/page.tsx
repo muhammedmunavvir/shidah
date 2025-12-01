@@ -39,6 +39,10 @@ export default function GoogleAuthPage() {
 
       if (res.data.success) {
         setUser(res.data.user);
+        if(res.data.user.role==="admin"){
+          router.push("/admin")
+          return
+        }
         router.push("/");
       } else {
         setError("Google authentication failed.");
