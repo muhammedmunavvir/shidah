@@ -45,7 +45,7 @@ export const googleLogin = async (req: Request, res: Response) => {
 
      const accessToken = generateToken(
       { _id: user._id, email: user.email, role: user.role },
-      "15m"   
+      "5m"   
     );
 
     const refreshToken = generateToken(
