@@ -18,7 +18,7 @@ export const refreshAccessToken = (req:Request, res:Response) => {
 
     // Generate new access token
     const newAccessToken = generateToken(
-      { id: decoded.id },
+      { _id: decoded._id },
       "15m"
     );
 
