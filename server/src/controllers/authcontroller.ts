@@ -44,12 +44,12 @@ export const googleLogin = async (req: Request, res: Response) => {
     }
 
      const accessToken = generateToken(
-      { id: user._id, email: user.email, role: user.role },
+      { _id: user._id, email: user.email, role: user.role },
       "15m"   
     );
 
     const refreshToken = generateToken(
-      { id: user._id },
+      { _id: user._id },
       "7d"     // refresh token → 7 days
     );
 

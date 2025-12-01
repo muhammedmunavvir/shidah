@@ -5,7 +5,7 @@ export interface AuthRequest {
 }
 
 export interface JwtPayload {
-  id: string;
+  _id: string;
   email: string;
   role: string;
   avatar?: string;
@@ -14,7 +14,7 @@ export interface JwtPayload {
 }
 
 export interface RefreshTokenPayload {
-  id: string;
+  _id: string;
 }
 
 export type TokenPayload = JwtPayload | RefreshTokenPayload;
