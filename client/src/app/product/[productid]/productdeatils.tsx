@@ -11,10 +11,23 @@ import { useAuthStore } from "@/store/useAuthstore";
 import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/userCartstore";
+import ProductDetailSkeleton from "@/components/skeletons/ProductDetailSkeleton";
+import { useState } from "react";
 export default function Productdetails({ product }: { product: Product }) {
   const { user } = useAuthStore();
-  console.log(user,"proddetial")
+  console.log(user, "proddetial");
   const { addItem } = useCartStore();
+  const [adding, setAdding] = useState(false);
+
+  if (!product) {
+    return (
+      <>
+        <Navbar />
+        <ProductDetailSkeleton />
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
@@ -131,7 +144,10 @@ export default function Productdetails({ product }: { product: Product }) {
           <div className="flex gap-4 mt-6">
             <Button
               size="lg"
-              className="flex items-center gap-2"
+              disabled={adding}
+              className={`flex items-center gap-2 ${
+                adding ? "opacity-60 cursor-not-allowed" : ""
+              }`}
               onClick={async () => {
                 if (!user) {
                   alert("Please login first!");
@@ -139,6 +155,7 @@ export default function Productdetails({ product }: { product: Product }) {
                 }
 
                 try {
+                  setAdding(true);
                   if (!user?._id) {
                     toast.error("User not found, please login again!");
                     return;
@@ -152,10 +169,22 @@ export default function Productdetails({ product }: { product: Product }) {
                 } catch (error) {
                   toast.error("Failed to add item to cart!");
                   console.error(error);
+                } finally {
+                  setAdding(false);
                 }
               }}
             >
-              <ShoppingCart size={20} /> Add to Cart
+              {adding ? (
+                <div className="flex items-center gap-2">
+                  {/* SPINNER */}
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin" />
+                  Please wait...
+                </div>
+              ) : (
+                <>
+                  <ShoppingCart size={20} /> Add to Cart
+                </>
+              )}
             </Button>
 
             <Button

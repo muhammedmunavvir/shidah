@@ -91,7 +91,7 @@ export default function Landingpage() {
 
       {/* Popup */}
       <div >
-        <PopupAd delay={5000} showOnce={false}>
+        <PopupAd delay={5000} showOnce={true} expireHours={4}>
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-3 text-black dark:text-white">
               🔥 20% OFF Today!

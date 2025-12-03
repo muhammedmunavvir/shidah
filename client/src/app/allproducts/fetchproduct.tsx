@@ -9,15 +9,18 @@ import { Star, Heart, ShoppingCart, Eye } from "lucide-react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { Product } from "@/types/product";
-
+import { Skeleton } from "@/components/ui/skeleton";
+// import {ThreeDot} from "react-loading-indicators"
 export default function Allproducts({ products }: { products: Product[] }) {
-  const { setProducts } = useProductStore();
+  const { setProducts, loading } = useProductStore();
 
   const [hovered, setHovered] = useState<string | null>(null);
   const [favorites, setFavorites] = useState(new Set<string>());
 
   useEffect(() => {
-    if (products?.length > 0) setProducts(products);
+    if (products) {
+      setProducts(products);
+    }
   }, [products, setProducts]);
 
   const toggleFavorite = (id: string) => {
@@ -28,12 +31,45 @@ export default function Allproducts({ products }: { products: Product[] }) {
     });
   };
 
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <section className="py-10 container mx-auto px-4">
+          <h2 className="text-2xl font-bold mb-6 dark:text-white">
+            Loading Products...
+          </h2>
+
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div
+                key={i}
+                className="bg-white dark:bg-black/40 rounded-lg overflow-hidden border border-black/10 animate-pulse"
+              >
+                {/* Image placeholder */}
+                <Skeleton className="h-48 w-full" />
+
+                <div className="p-3 space-y-2">
+                  <Skeleton className="w-16 h-3" />
+                  <Skeleton className="w-32 h-4" />
+                  <Skeleton className="w-20 h-4" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      </>
+    );
+  }
+
   return (
     <>
       <Navbar />
 
       <section className="py-10 container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-6 dark:text-white">All Products</h2>
+        <h2 className="text-2xl font-bold mb-6 dark:text-white">
+          All Products
+        </h2>
 
         {/* MATCHING LANDING PAGE GRID */}
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
@@ -52,7 +88,6 @@ export default function Allproducts({ products }: { products: Product[] }) {
                   onMouseLeave={() => setHovered(null)}
                 >
                   <CardContent className="p-3">
-
                     {/* IMAGE LIKE LANDING PAGE */}
                     <div className="relative overflow-hidden bg-black aspect-[3/4]">
                       <img
@@ -135,7 +170,9 @@ export default function Allproducts({ products }: { products: Product[] }) {
                       </h3>
 
                       <div className="flex justify-between items-center mt-1">
-                        <span className="text-lg font-bold">₹{p.discountPrice}</span>
+                        <span className="text-lg font-bold">
+                          ₹{p.discountPrice}
+                        </span>
                         {p.price !== p.discountPrice && (
                           <span className="text-xs line-through text-gray-400">
                             ₹{p.price}

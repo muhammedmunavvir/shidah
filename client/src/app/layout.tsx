@@ -35,7 +35,7 @@ export default function RootLayout({
         <AOSProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark" 
             enableSystem
             disableTransitionOnChange={false}
           >
