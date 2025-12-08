@@ -34,7 +34,7 @@ app.use("/api/v1/admin", adminRoute);
 // Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/auth", authrouter);
-app.use(checkMaintenanceMode)
+// app.use(checkMaintenanceMode)
 app.use("/api/v1/cart", cartrouter);
 app.use("/api/v1/order", Ordercreationroute);
 app.use("/api/v1/order", myorderRoute);
