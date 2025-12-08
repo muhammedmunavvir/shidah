@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import "aos/dist/aos.css";
+import Link from "next/link";
 
 export default function MobileHero() {
   const slides = [
@@ -126,9 +127,9 @@ export default function MobileHero() {
             New arrivals crafted with softness & grace for the modern soul.
           </p>
 
-          <button className="mt-6 w-fit px-10 py-4 bg-black text-white dark:bg-white dark:text-black hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white uppercase text-sm transition-colors duration-200">
+          <Link href="allproducts" className="mt-6 w-fit px-10 py-4 bg-black text-white dark:bg-white dark:text-black hover:bg-white hover:text-black dark:hover:bg-black dark:hover:text-white uppercase text-sm transition-colors duration-200">
             shope now
-          </button>
+          </Link>
         </div>
 
         {/* RIGHT IMAGE/VIDEO */}

@@ -6,6 +6,7 @@ import { LayoutDashboard, Users, Package, Settings, LogOut, Boxes, Menu } from "
 import { useAuthStore } from "@/store/useAuthstore";
 import { useEffect, useState } from "react";
 import { useAuthInit } from "@/hooks/useAuthInit";
+import { logoutapi } from "@/api/logout";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
    useAuthInit();
@@ -27,9 +28,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Users", icon: <Users size={18} />, href: "/admin/users" },
     { name: "Orders", icon: <Package size={18} />, href: "/admin/orders" },
     { name: "Products", icon: <Boxes size={18} />, href: "/admin/products" },
-    { name: "Settings", icon: <Settings size={18} />, href: "/admin/settings" },
+    { name: "Settings", icon: <Settings size={18} />, href: "/admin/setting" },
   ];
 
+  async function handleLogout() {
+      try {
+        await logoutapi();
+        logout();
+      } catch (error) {
+        console.log("Logout error:", error);
+      }
+    }
   return (
     <div className="flex min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* MOBILE TOP BAR */}
@@ -71,6 +80,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="mt-auto p-4 border-t dark:border-gray-700">
           <button
             onClick={() => {
+              handleLogout()
               logout();
               document.cookie = "token=; path=/; max-age=0;";
               router.push("/auth/login");

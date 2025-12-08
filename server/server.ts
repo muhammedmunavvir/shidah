@@ -9,7 +9,7 @@ import Ordercreationroute from "./src/routes/OrderCreation.route";
 import myorderRoute from "./src/routes/myorder.route";
 import adminRoute from "./src/routes/admin.route";
 import cookieParser from "cookie-parser";
-
+import { checkMaintenanceMode } from "./src/middleware/maintenanceMiddleware";
 dotenv.config();
 connectDB();
 
@@ -29,15 +29,17 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// Admin Routes
+app.use("/api/v1/admin", adminRoute);
 // Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/auth", authrouter);
+app.use(checkMaintenanceMode)
 app.use("/api/v1/cart", cartrouter);
 app.use("/api/v1/order", Ordercreationroute);
 app.use("/api/v1/order", myorderRoute);
 
-// Admin Routes
-app.use("/api/v1/admin", adminRoute);
+
 
 app.get("/", (req, res) => {
   res.send("API is running");
