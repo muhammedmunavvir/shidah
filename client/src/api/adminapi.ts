@@ -15,6 +15,11 @@ export const CreateProductApi = async (productData: any) => {
   const response = await api.post("/admin/product-createProduct", productData);
   return response.data;
 };
+export const UpdateProductApi = async (productId: string, productData: any) => {
+  const response = await api.put(`/admin/product-updateProduct/${productId}`, productData);
+  return response.data;
+};
+
 export const GetAllUsers = async () => {
   const response = await api.get("/admin/usersList");
   return response.data;

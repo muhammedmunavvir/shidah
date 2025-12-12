@@ -76,9 +76,9 @@ export default function AdminProductPage() {
                   </td>
                   <td className="p-3 text-center">
                     <div className="flex justify-center gap-3">
-                      <button className="text-blue-500 hover:text-blue-700">
+                      <Link href={`/admin/products/editProducts/${p._id}`} className="text-blue-500 hover:text-blue-700">
                         <Edit size={18} />
-                      </button>
+                      </Link>
                       <button className="text-red-500 hover:text-red-700">
                         <Trash2 size={18} />
                       </button>

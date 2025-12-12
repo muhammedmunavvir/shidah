@@ -1,13 +1,15 @@
+import { getProducts } from "@/api/product";
 import { Footer } from "@/components/Footer";
 import Heropage from "@/components/Heropage";
 import Landingpage from "@/components/Landingpage";
 import Navbar from "@/components/Navbar";
-export default function Homepage() {
+export default async function Homepage() {
+  const products = await getProducts();
   return (
     <>
       <Navbar />
       <Heropage/>
-      <Landingpage/>
+      <Landingpage products={products}/>
       <Footer/>
     </>
   );

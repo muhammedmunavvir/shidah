@@ -13,12 +13,12 @@ import { toast } from "sonner";
 import { useCartStore } from "@/store/userCartstore";
 import ProductDetailSkeleton from "@/components/skeletons/ProductDetailSkeleton";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 export default function Productdetails({ product }: { product: Product }) {
   const { user } = useAuthStore();
-  console.log(user, "proddetial");
   const { addItem } = useCartStore();
   const [adding, setAdding] = useState(false);
-
+  const router=useRouter()
   if (!product) {
     return (
       <>
@@ -151,6 +151,7 @@ export default function Productdetails({ product }: { product: Product }) {
               onClick={async () => {
                 if (!user) {
                   alert("Please login first!");
+                  router.push("/auth/googleauth")
                   return;
                 }
 

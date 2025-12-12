@@ -15,14 +15,15 @@ import PopupAd from "./PopupAd";
 
 import "aos/dist/aos.css";
 import Link from "next/link";
+import { useProductStore } from "@/store/useProductstore";
+import { Product } from "@/types/product";
 
-export default function Landingpage() {
+export default function Landingpage({ products }: { products: Product[] }) {
   const [isVisible, setIsVisible] = useState(false);
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [favorites, setFavorites] = useState(new Set<number>());
 
-  
-
+  console.log(products, "landing...");
   useEffect(() => setIsVisible(true), []);
 
   const toggleFavorite = (productId: number) => {
@@ -35,62 +36,10 @@ export default function Landingpage() {
     });
   };
 
-  const clothingProducts = [
-    {
-      id: 1,
-      name: "Premium Cotton Hoodie",
-      category: "Hoodies",
-      price: 89.99,
-      originalPrice: 129.99,
-      discount: "30% OFF",
-      rating: 4.8,
-      image:
-        "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop",
-      badge: "Best Seller",
-    },
-    {
-      id: 2,
-      name: "Designer Denim Jacket",
-      category: "Jackets",
-      price: 149.99,
-      originalPrice: 199.99,
-      discount: "25% OFF",
-      rating: 4.9,
-      image:
-        "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400&h=500&fit=crop",
-      badge: "New Arrival",
-    },
-    {
-      id: 3,
-      name: "Luxury Silk Dress",
-      category: "Dresses",
-      price: 199.99,
-      originalPrice: 299.99,
-      discount: "33% OFF",
-      rating: 4.7,
-      image:
-        "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
-      badge: "Premium",
-    },
-    {
-      id: 4,
-      name: "Classic Oxford Shirt",
-      category: "Shirts",
-      price: 69.99,
-      originalPrice: 99.99,
-      discount: "30% OFF",
-      rating: 4.6,
-      image:
-        "https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=400&h=500&fit=crop",
-      badge: "Trending",
-    },
-  ];
-
   return (
     <section className="min-h-screen relative bg-white dark:bg-black text-gray-900 dark:text-white overflow-hidden">
-
       {/* Popup */}
-      <div >
+      <div>
         <PopupAd delay={5000} showOnce={true} expireHours={4}>
           <div className="text-center">
             <h2 className="text-3xl font-bold mb-3 text-black dark:text-white">
@@ -127,7 +76,6 @@ export default function Landingpage() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 pt-6 pb-12">
-
         {/* Top Section */}
         <div
           className={`text-left mb-16 transition-all duration-700 ${
@@ -143,132 +91,139 @@ export default function Landingpage() {
         </div>
 
         {/* PRODUCT GRID */}
-        <div
-          className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6"
-        >
-          {clothingProducts.map((product, i) => (
-            <div data-aos="fade-up" data-aos-delay={i * 120} key={product.id}>
-              <Card
-                className="
-                  group cursor-pointer overflow-hidden rounded-none
-                  bg-white dark:bg-black/40 border border-black/10
-                  backdrop-blur-xl shadow-[0_0_15px_rgba(0,0,0,0.05)]
-                  dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]
-                  transition-all duration-300 hover:scale-[1.03]
-                "
-                onMouseEnter={() => setHoveredProduct(product.id)}
-                onMouseLeave={() => setHoveredProduct(null)}
-              >
-                <CardContent className="p-3">
-                  {/* IMAGE */}
-                  <div className="relative overflow-hidden bg-black aspect-[3/4]">
-                    <img
-                      src={product.image}
-                      className="w-full h-40 sm:h-48 object-cover transition duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100"
-                    />
-
-                    {/* Overlay Buttons */}
-                    <div
-                      className={`
-                        absolute inset-0 flex items-center justify-center gap-2
-                        bg-black/60 backdrop-blur-sm transition-all duration-300
-                        ${
-                          hoveredProduct === product.id
-                            ? "opacity-100"
-                            : "opacity-0"
-                        }
-                      `}
-                    >
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-white/40 text-white bg-white/10 hover:bg-white/20"
-                      >
-                        <Eye className="w-4 h-4 mr-1" /> View
-                      </Button>
-
-                      <Button
-                        size="sm"
-                        className="bg-white text-black hover:bg-gray-200"
-                      >
-                        <ShoppingCart className="w-4 h-4 mr-1" /> Cart
-                      </Button>
-                    </div>
-
-                    {/* Badge */}
-                    <div className="absolute top-3 left-3 px-2 py-1 text-[10px] bg-black/60 text-white rounded-full backdrop-blur-sm">
-                      {product.badge}
-                    </div>
-
-                    {/* Discount */}
-                    <div className="absolute top-3 right-3 px-2 py-1 text-[10px] bg-white text-black rounded-full">
-                      {product.discount}
-                    </div>
-
-                    {/* Favorite */}
-                    <button
-                      onClick={() => toggleFavorite(product.id)}
-                      className="absolute bottom-3 right-3 p-2 rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30"
-                    >
-                      <Heart
-                        className={`w-4 h-4 ${
-                          favorites.has(product.id)
-                            ? "text-red-500 fill-red-500"
-                            : "text-white"
-                        }`}
+        {/* PRODUCT GRID */}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+          {products.map((p, i) => (
+            <div data-aos="fade-up" data-aos-delay={i * 120} key={p._id}>
+              <Link href={`/product/${p._id}`}>
+                <Card
+                  className="
+            group cursor-pointer overflow-hidden rounded-none
+            bg-white dark:bg-black/40 border border-black/10
+            backdrop-blur-xl shadow-[0_0_15px_rgba(0,0,0,0.05)]
+            dark:shadow-[0_0_20px_rgba(255,255,255,0.03)]
+            transition-all duration-300 hover:scale-[1.03]
+          "
+                  onMouseEnter={() => setHoveredProduct(p._id)}
+                  onMouseLeave={() => setHoveredProduct(null)}
+                >
+                  <CardContent className="p-3">
+                    {/* IMAGE (FULL HEIGHT LIKE PRODUCT PAGE) */}
+                    <div className="relative overflow-hidden bg-black aspect-[3/4]">
+                      <img
+                        src={p.images[0]}
+                        alt={p.name}
+                        className="w-full h-full object-cover transition duration-500 group-hover:scale-110 opacity-90 group-hover:opacity-100"
                       />
-                    </button>
-                  </div>
 
-                  {/* TEXT */}
-                  <div className="mt-3">
-                    <div className="flex justify-between items-center mb-1">
-                      <span className="text-[11px] bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">
-                        {product.category}
-                      </span>
+                      {/* Overlay Buttons (Same as product page) */}
+                      <div
+                        className={`
+                  absolute inset-0 flex items-center justify-center gap-2
+                  bg-black/60 backdrop-blur-sm transition-all duration-300
+                  ${hoveredProduct === p._id ? "opacity-100" : "opacity-0"}
+                `}
+                      >
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-white/40 text-white bg-white/10 hover:bg-white/20"
+                        >
+                          <Eye className="w-4 h-4 mr-1" /> View
+                        </Button>
 
-                      <div className="flex items-center gap-1 text-xs">
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                        {product.rating}
+                        <Button
+                          size="sm"
+                          className="bg-white text-black hover:bg-gray-200"
+                        >
+                          <ShoppingCart className="w-4 h-4 mr-1" /> Cart
+                        </Button>
+                      </div>
+
+                      {/* Badge */}
+                      {p.badge && (
+                        <div className="absolute top-3 left-3 px-2 py-1 text-[10px] bg-white text-black rounded-full">
+                          {p.badge}
+                        </div>
+                      )}
+
+                      {/* Discount */}
+                      {p.discount && (
+                        <div className="absolute top-3 right-3 px-2 py-1 text-[10px] bg-white text-black rounded-full">
+                          {p.discount}
+                        </div>
+                      )}
+
+                      {/* Favorite */}
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          toggleFavorite(p._id);
+                        }}
+                        className="absolute bottom-3 right-3 p-2 rounded-full bg-white/20 backdrop-blur-md border border-white/20 hover:bg-white/30"
+                      >
+                        <Heart
+                          className={`w-4 h-4 ${
+                            favorites.has(p._id)
+                              ? "text-red-500 fill-red-500"
+                              : "text-white"
+                          }`}
+                        />
+                      </button>
+                    </div>
+
+                    {/* TEXT */}
+                    <div className="mt-3">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[11px] bg-black/5 dark:bg-white/10 px-2 py-1 rounded-full">
+                          {p.category}
+                        </span>
+
+                        <div className="flex items-center gap-1 text-xs">
+                          <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+                          {p.ratings?.average || 0}
+                        </div>
+                      </div>
+
+                      <h3 className="text-sm sm:text-base font-semibold text-black dark:text-white">
+                        {p.name}
+                      </h3>
+
+                      <div className="flex justify-between items-center mt-1">
+                        <span className="text-lg font-bold">
+                          ₹{p.discountPrice}
+                        </span>
+
+                        {p.price !== p.discountPrice && (
+                          <span className="text-xs line-through text-gray-400">
+                            ₹{p.price}
+                          </span>
+                        )}
                       </div>
                     </div>
-
-                    <h3 className="text-sm sm:text-base font-semibold text-black dark:text-white">
-                      {product.name}
-                    </h3>
-
-                    <div className="flex justify-between items-center mt-1">
-                      <span className="text-lg font-bold">
-                        ${product.price}
-                      </span>
-                      <span className="text-xs line-through text-gray-400">
-                        ${product.originalPrice}
-                      </span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </Link>
             </div>
           ))}
         </div>
 
         {/* View All */}
         <div className="text-center mt-16" data-aos="fade-up">
-  <Link
-    href="/allproducts"
-    className="
+          <Link
+            href="/allproducts"
+            className="
       inline-flex items-center justify-center
       bg-black text-white dark:bg-white dark:text-black
       px-8 py-4 
       hover:opacity-80 transition
     "
-  >
-    <ShoppingBag className="w-5 h-5 mr-2" />
-    View All Products
-    <ArrowRight className="w-5 h-5 ml-2" />
-  </Link>
-</div>
-
+          >
+            <ShoppingBag className="w-5 h-5 mr-2" />
+            View All Products
+            <ArrowRight className="w-5 h-5 ml-2" />
+          </Link>
+        </div>
       </div>
     </section>
   );
