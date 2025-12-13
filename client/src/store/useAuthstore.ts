@@ -20,8 +20,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: true,
   hydrated: false,
-  setUser: (user) => set({ user }),
-  setHydrated: (v) => set({ hydrated: v }),
+ setUser: (user) =>
+    set({
+      user,
+      loading: false,   
+      hydrated: true,  
+    }),  setHydrated: (v) => set({ hydrated: v }),
 
   logout: () => {
     set({ user: null, loading: false });

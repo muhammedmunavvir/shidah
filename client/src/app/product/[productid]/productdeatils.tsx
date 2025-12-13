@@ -12,13 +12,23 @@ import Navbar from "@/components/Navbar";
 import { toast } from "sonner";
 import { useCartStore } from "@/store/userCartstore";
 import ProductDetailSkeleton from "@/components/skeletons/ProductDetailSkeleton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useWishlistStore } from "@/store/wishliststore";
+
 export default function Productdetails({ product }: { product: Product }) {
   const { user } = useAuthStore();
   const { addItem } = useCartStore();
   const [adding, setAdding] = useState(false);
-  const router=useRouter()
+  const { toggleWishlist, isWishlisted, fetchWishlist, loading } =
+    useWishlistStore();
+
+useEffect(() => {
+  if (user?._id) fetchWishlist();
+}, [user?._id]);
+
+
+  const router = useRouter();
   if (!product) {
     return (
       <>
@@ -150,8 +160,8 @@ export default function Productdetails({ product }: { product: Product }) {
               }`}
               onClick={async () => {
                 if (!user) {
-                  alert("Please login first!");
-                  router.push("/auth/googleauth")
+                  toast.error("Please login first!");
+                  router.push("/auth/googleauth");
                   return;
                 }
 
@@ -189,12 +199,32 @@ export default function Productdetails({ product }: { product: Product }) {
             </Button>
 
             <Button
-              size="lg"
-              variant="outline"
-              className="flex items-center gap-2"
-            >
-              <Heart size={20} /> Wishlist
-            </Button>
+  size="lg"
+  variant="outline"
+  disabled={loading}
+  className="flex items-center gap-2"
+  onClick={(e) => {
+    e.preventDefault();
+    toggleWishlist(product._id);
+  }}
+>
+  <Heart
+    size={20}
+    className={
+      loading
+        ? "text-gray-300"
+        : isWishlisted(product._id)
+        ? "text-red-500 fill-red-500"
+        : "text-gray-500"
+    }
+  />
+  {loading
+    ? "Loading..."
+    : isWishlisted(product._id)
+    ? "Wishlisted"
+    : "Wishlist"}
+</Button>
+
           </div>
 
           {/* Stock Info */}

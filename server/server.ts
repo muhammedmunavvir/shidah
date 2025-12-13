@@ -10,6 +10,7 @@ import myorderRoute from "./src/routes/myorder.route";
 import adminRoute from "./src/routes/admin.route";
 import cookieParser from "cookie-parser";
 import { checkMaintenanceMode } from "./src/middleware/maintenanceMiddleware";
+import wishlistroute from "./src/routes/wishlist.route";
 dotenv.config();
 connectDB();
 
@@ -38,9 +39,10 @@ app.use("/api/v1/auth", authrouter);
 app.use("/api/v1/cart", cartrouter);
 app.use("/api/v1/order", Ordercreationroute);
 app.use("/api/v1/order", myorderRoute);
+app.use("/api/v1/wishlist", wishlistroute); 
+ 
 
-
-
+ 
 app.get("/", (req, res) => {
   res.send("API is running");
 });

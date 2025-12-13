@@ -15,7 +15,6 @@ import PopupAd from "./PopupAd";
 
 import "aos/dist/aos.css";
 import Link from "next/link";
-import { useProductStore } from "@/store/useProductstore";
 import { Product } from "@/types/product";
 
 export default function Landingpage({ products }: { products: Product[] }) {
@@ -23,7 +22,6 @@ export default function Landingpage({ products }: { products: Product[] }) {
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   const [favorites, setFavorites] = useState(new Set<number>());
 
-  console.log(products, "landing...");
   useEffect(() => setIsVisible(true), []);
 
   const toggleFavorite = (productId: number) => {

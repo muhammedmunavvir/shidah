@@ -1,12 +1,22 @@
 import { fetchsingleproduct } from "@/api/product";
 import Productdetails from "./productdeatils";
+import { notFound } from "next/navigation";
 
-export default async function ProductPage({ params }: { params: { productid: string } }) {
-  const product = await fetchsingleproduct(params.productid);
+export default async function ProductPage({
+  params,
+}: {
+  params: Promise<{ productid: string }>;
+}) {
+  const { productid } = await params; 
+  if (!productid) {
+    notFound();
+  }
 
-  if (!product) return <div>Product not found</div>;
+  const product = await fetchsingleproduct(productid);
 
-  return  <Productdetails product={product}/>
-    
-  
+  if (!product) {
+    notFound();
+  }
+
+  return <Productdetails product={product} />;
 }

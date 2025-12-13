@@ -1,6 +1,15 @@
 "use client";
 
-import { Search, ShoppingCart, User, Menu, X, Moon, Sun } from "lucide-react";
+import {
+  Search,
+  ShoppingCart,
+  User,
+  Menu,
+  X,
+  Moon,
+  Sun,
+  Heart,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +29,7 @@ import { useTheme } from "next-themes";
 import { Playwrite_NO } from "next/font/google";
 import { useAuthInit } from "@/hooks/useAuthInit";
 import { logoutapi } from "@/api/logout";
+import { useWishlistStore } from "@/store/wishliststore";
 
 const playwrite = Playwrite_NO({
   style: ["normal"],
@@ -38,10 +48,15 @@ export default function Navbar() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+const { items: wishlistItems, fetchWishlist } = useWishlistStore();
 
-  useEffect(() => {
-    if (user?._id) Getitem();
-  }, [user, Getitem]);
+useEffect(() => {
+  if (user?._id) {
+    Getitem();        // cart
+    fetchWishlist(); // wishlist
+  }
+}, [user, Getitem, fetchWishlist]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -221,7 +236,9 @@ export default function Navbar() {
                 onClick={() => router.push("/usercart")}
               >
                 <ShoppingCart
-                  className={`text-black dark:text-white ${isScrolled ? "h-4 w-4" : "h-5 w-5"}`}
+                  className={`text-black dark:text-white ${
+                    isScrolled ? "h-4 w-4" : "h-5 w-5"
+                  }`}
                 />
                 <span
                   className={`
@@ -235,6 +252,39 @@ export default function Navbar() {
                 >
                   {items.length}
                 </span>
+              </Button>
+            )}
+
+            {/* Wishlist */}
+            {user && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className={`relative hover:bg-white/10 ${
+                  isScrolled ? "h-8 w-8" : "h-10 w-10"
+                }`}
+                onClick={() => router.push("/wishlist")}
+              >
+                <Heart
+                  className={`text-black dark:text-white ${
+                    isScrolled ? "h-4 w-4" : "h-5 w-5"
+                  }`}
+                />
+
+                {wishlistItems.length > 0 && (
+                  <span
+                    className={`
+          absolute rounded-full bg-pink-500 text-white flex items-center justify-center
+          ${
+            isScrolled
+              ? "-top-1 -right-1 h-3 w-3 text-[8px]"
+              : "-top-1 -right-1 h-4 w-4 text-[10px]"
+          }
+        `}
+                  >
+                    {wishlistItems.length}
+                  </span>
+                )}
               </Button>
             )}
 
@@ -360,6 +410,15 @@ export default function Navbar() {
                     <ShoppingCart className="mr-2 h-4 w-4" /> Cart (
                     {items.length})
                   </Button>
+                  <Button
+                    variant="ghost"
+                    className="justify-start text-black dark:text-white"
+                    onClick={() => router.push("/wishlist")}
+                  >
+                    <Heart className="mr-2 h-4 w-4" /> Wishlist (
+                    {wishlistItems.length})
+                  </Button>
+
                   <Button
                     variant="ghost"
                     className="justify-start text-black dark:text-white"

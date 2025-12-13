@@ -18,6 +18,7 @@ import type { CartItem } from "@/types/cart";
 import type { Product } from "@/types/product";
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
+import { useAuthStore } from "@/store/useAuthstore";
 
 // ✅ helper to always get string id
 const getProductId = (id: string | Product) =>
@@ -26,14 +27,23 @@ const getProductId = (id: string | Product) =>
 export default function Usercart() {
   const { items, Getitem, removeItem, updateQuantity } = useCartStore();
   const [isLoading, setIsLoading] = useState(true);
+const { user, loading: authLoading } = useAuthStore();
 
   useEffect(() => {
-    const loadCart = async () => {
-      await Getitem();
-      setIsLoading(false);
-    };
-    loadCart();
-  }, [Getitem]);
+  if (authLoading) return;
+
+  if (!user?._id) {
+    setIsLoading(false);
+    return;
+  }
+
+  const load = async () => {
+    await Getitem();
+    setIsLoading(false);
+  };
+
+  load();
+}, [authLoading, user?._id, Getitem]);
   const calculateTotal = () => {
     return items.reduce(
       (sum, item) =>

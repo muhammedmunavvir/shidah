@@ -8,6 +8,7 @@ import {
 import { CartItem } from "@/types/cart";
 import { Product } from "@/types/product";
 import { toast } from "sonner";
+import { useAuthStore } from "./useAuthstore";
 
 interface CartState {
   items: CartItem[];
@@ -20,7 +21,7 @@ interface CartState {
 
 export const useCartStore = create<CartState>((set, get) => ({
   items: [],
-
+  
   addItem: async (item: CartItem) => {
     try {
       const res = await addToCart({
@@ -31,12 +32,12 @@ export const useCartStore = create<CartState>((set, get) => ({
         qty: item.qty,
         userId: item.userId,
       });
-
+      
       if (res?.message?.toLowerCase().includes("already")) {
         toast.info(res.message);
         return;
       }
-
+      
       if (res?.message?.toLowerCase().includes("added")) {
         set({ items: res.cart.items });
         toast.success(res.message);
@@ -48,8 +49,13 @@ export const useCartStore = create<CartState>((set, get) => ({
   },
 
   setCart: (items: CartItem[]) => set({ items }),
-
+  
   Getitem: async () => {
+    const { user, loading } = useAuthStore.getState();
+     if (loading || !user?._id) {
+    set({ items: [] });
+    return;
+  }
     try {
       const res = await getusercartapi();
       if (res?.data?.length > 0) {
