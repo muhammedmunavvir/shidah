@@ -1,8 +1,8 @@
-import MaintainenceSettings from "./maintenanceSetting";
+// import MaintainenceSettings from "./maintenanceSetting";
 
-export default function Adminsetting() {
-  return <>
+// export default function Adminsetting() {
+//   return <>
   
-    <MaintainenceSettings/>
-  </>;
-}
+//     <MaintainenceSettings/>
+//   </>;
+// }
