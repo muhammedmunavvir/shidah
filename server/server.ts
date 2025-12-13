@@ -9,7 +9,7 @@ import Ordercreationroute from "./src/routes/OrderCreation.route";
 import myorderRoute from "./src/routes/myorder.route";
 import adminRoute from "./src/routes/admin.route";
 import cookieParser from "cookie-parser";
-import { checkMaintenanceMode } from "./src/middleware/maintenanceMiddleware";
+// import { checkMaintenanceMode } from "./src/middleware/maintenanceMiddleware";
 import wishlistroute from "./src/routes/wishlist.route";
 dotenv.config();
 connectDB();
