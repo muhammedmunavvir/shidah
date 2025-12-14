@@ -2,7 +2,6 @@
 
 import { verifyPaymentApi } from "@/api/CreateOrderapi";
 import { toast } from "sonner";
-import { useRouter } from "next/router";
 interface RazorpayOptions {
   key: string;
   orderId: string; // Razorpay order id (from backend)
@@ -18,9 +17,11 @@ interface RazorpayOptions {
   };
 }
 
-export const openRazorpay = (options: RazorpayOptions) => {
+export const openRazorpay = (options: RazorpayOptions,setProcessingPayment:any) => {
   //const router=useRouter()
   if (typeof window === "undefined") return;
+    setProcessingPayment(true);
+
 
   const razorpayOptions = {
     key: options.key,
@@ -41,10 +42,8 @@ export const openRazorpay = (options: RazorpayOptions) => {
         });
 
         if (result.success) {
-          toast.success(" Payment verified successfully!");
-          setTimeout(() => {
-            window.location.href = "/order-summary";
-          }, 1500);
+          toast.success("Payment verified successfully!");
+          window.location.replace("/order-summary");
         } else {
           toast.error(" Payment verification failed");
         }
@@ -55,6 +54,7 @@ export const openRazorpay = (options: RazorpayOptions) => {
     },
     modal: {
       ondismiss: function () {
+        setProcessingPayment(false);
         toast.info("Payment cancelled by user");
       },
     },

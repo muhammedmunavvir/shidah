@@ -14,7 +14,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Lock, Shield, Star, Truck, ArrowLeft } from "lucide-react";
+import {
+  Lock,
+  Shield,
+  Star,
+  Truck,
+  ArrowLeft,
+  AlertCircle,
+} from "lucide-react";
 import { indianStates } from "@/constants/IndianStates";
 import { useCartStore } from "@/store/userCartstore";
 import type { Product } from "@/types/product";
@@ -24,6 +31,21 @@ import { createOrderApi } from "@/api/CreateOrderapi";
 import { useRouter } from "next/navigation";
 import { openRazorpay } from "../RazorpayChekout/Razorpaychekout";
 import { useAuthStore } from "@/store/useAuthstore";
+
+// Validation error interface
+interface ValidationErrors {
+  contact?: {
+    FirstName?: string;
+    LastName?: string;
+    PhoneNumber?: string;
+  };
+  shipping?: {
+    StreetAddress?: string;
+    City?: string;
+    State?: string;
+    PinCode?: string;
+  };
+}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -41,74 +63,209 @@ export default function CheckoutPage() {
     return sum + price * (item.qty || 1);
   }, 0);
 
-  const shipping = items.length > 0 ? 0 : 0; // e.g., ₹49 shipping if not empty
-  const tax = subtotal * 0.05; // 5% GST
+  const shipping = items.length > 0 ? 0 : 0;
+  const tax = subtotal * 0.05;
   const total = subtotal + shipping + tax;
 
-  // Form states
+  const [processingPayment, setProcessingPayment] = useState(false);
+
+  // Form states with initial values from user data
   const [UserContactInformation, setUserContactInformation] = useState({
     userId: user?._id || "",
-    FirstName: "",
-    LastName: "",
+    FirstName: user?.firstName || "",
+    LastName: user?.lastName || "",
     EmailAddress: user?.email || "",
-    PhoneNumber: "",
+    PhoneNumber: user?.phoneNumber || "",
   });
 
   const [UserShippingAddress, setUserShippingAddress] = useState({
-    StreetAddress: "",
-    Appartment: "",
-    City: "",
-    State: "",
-    PinCode: "",
+    StreetAddress: user?.address?.street || "",
+    Appartment: user?.address?.appartment || "",
+    City: user?.address?.city || "",
+    State: user?.address?.state || "",
+    PinCode: user?.address?.pinCode || "",
   });
+
+  // Validation errors state
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>(
+    {}
+  );
+  const [isFormTouched, setIsFormTouched] = useState(false);
+
+  // Validation functions
+  const validateContactInfo = () => {
+    const errors: ValidationErrors["contact"] = {};
+
+    if (!UserContactInformation.FirstName.trim()) {
+      errors.FirstName = "First name is required";
+    } else if (UserContactInformation.FirstName.trim().length < 2) {
+      errors.FirstName = "First name must be at least 2 characters";
+    }
+
+    if (!UserContactInformation.LastName.trim()) {
+      errors.LastName = "Last name is required";
+    } else if (UserContactInformation.LastName.trim().length < 1) {
+      errors.LastName = "Last name must be at least 1 character";
+    }
+
+    if (!UserContactInformation.PhoneNumber.trim()) {
+      errors.PhoneNumber = "Phone number is required";
+    } else if (
+      !/^[6-9]\d{9}$/.test(UserContactInformation.PhoneNumber.trim())
+    ) {
+      errors.PhoneNumber = "Please enter a valid Indian phone number";
+    }
+
+    return errors;
+  };
+
+  const validateShippingAddress = () => {
+    const errors: ValidationErrors["shipping"] = {};
+
+    if (!UserShippingAddress.StreetAddress.trim()) {
+      errors.StreetAddress = "Street address is required";
+    } else if (UserShippingAddress.StreetAddress.trim().length < 5) {
+      errors.StreetAddress = "Please enter a valid address";
+    }
+
+    if (!UserShippingAddress.City.trim()) {
+      errors.City = "City is required";
+    } else if (UserShippingAddress.City.trim().length < 2) {
+      errors.City = "Please enter a valid city";
+    }
+
+    if (!UserShippingAddress.State) {
+      errors.State = "State is required";
+    }
+
+    if (!UserShippingAddress.PinCode.trim()) {
+      errors.PinCode = "PIN code is required";
+    } else if (!/^\d{6}$/.test(UserShippingAddress.PinCode.trim())) {
+      errors.PinCode = "Please enter a valid 6-digit PIN code";
+    }
+
+    return errors;
+  };
+
+  const validateForm = () => {
+    const contactErrors = validateContactInfo();
+    const shippingErrors = validateShippingAddress();
+
+    const hasErrors =
+      Object.keys(contactErrors).length > 0 ||
+      Object.keys(shippingErrors).length > 0;
+
+    setValidationErrors({
+      contact: contactErrors,
+      shipping: shippingErrors,
+    });
+
+    return !hasErrors;
+  };
 
   const HandleContactInformation = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserContactInformation((prev) => ({ ...prev, [name]: value }));
+    setIsFormTouched(true);
+
+    // Clear validation error for this field
+    if (
+      validationErrors.contact?.[name as keyof typeof validationErrors.contact]
+    ) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        contact: {
+          ...prev.contact,
+          [name]: undefined,
+        },
+      }));
+    }
   };
 
   const HandleShippingAddress = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setUserShippingAddress((prev) => ({ ...prev, [name]: value }));
+    setIsFormTouched(true);
+
+    // Clear validation error for this field
+    if (
+      validationErrors.shipping?.[
+        name as keyof typeof validationErrors.shipping
+      ]
+    ) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        shipping: {
+          ...prev.shipping,
+          [name]: undefined,
+        },
+      }));
+    }
   };
+
+  const handleStateChange = (val: string) => {
+    setUserShippingAddress((prev) => ({
+      ...prev,
+      State: val,
+    }));
+    setIsFormTouched(true);
+
+    // Clear state validation error
+    if (validationErrors.shipping?.State) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        shipping: {
+          ...prev.shipping,
+          State: undefined,
+        },
+      }));
+    }
+  };
+
   const { mutate: completeOrder, isPending } = useMutation({
     mutationFn: createOrderApi,
     onSuccess: (data) => {
-        toast.success("Order created successfully!");
+      toast.success("Order created successfully!");
 
-      // Open Razorpay checkout using the response
-      openRazorpay({
-        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!, 
-        orderId: data.order.id, // Razorpay order ID
-        amount: data.order.amount, 
-        currency: data.order.currency,
-        name: "shidah.in",
-        description: "Secure payment with Razorpay",
-        prefill: {
-          name: `${UserContactInformation.FirstName} ${UserContactInformation.LastName}`,
-          email: UserContactInformation.EmailAddress,
-          contact: UserContactInformation.PhoneNumber,
+      openRazorpay(
+        {
+          key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
+          orderId: data.order.id,
+          amount: data.order.amount,
+          currency: data.order.currency,
+          name: "shidah.in",
+          description: "Secure payment with Razorpay",
+          prefill: {
+            name: `${UserContactInformation.FirstName} ${UserContactInformation.LastName}`,
+            email: UserContactInformation.EmailAddress,
+            contact: UserContactInformation.PhoneNumber,
+          },
+          dbOrderId: data.dbOrderId, // ✔ IMPORTANT
         },
-        notes: {
-          dbOrderId: data.dbOrderId, // pass MongoDB order reference
-        },
-        onSuccess: (paymentResponse: any) => {
-          router.push(`/order-confirmation/${data.dbOrderId}`);
-        },
-        onFailure: () => {
-          toast.error("Payment failed. Please try again!");
-        },
-      });
-    },
-    onError: (error: any) => {
-      console.log(error)
-      toast.error(error?.response?.data?.message || "Something went wrong!");
+        setProcessingPayment // ✔ SECOND ARGUMENT
+      );
     },
   });
 
   const handleCompleteOrder = () => {
     if (items.length === 0) {
       toast.error("Your cart is empty!");
+      return;
+    }
+
+    // Validate form before proceeding
+    if (!validateForm()) {
+      toast.error("Please fix the errors in the form before proceeding.");
+      // Scroll to first error
+      const firstErrorElement = document.querySelector(
+        '[class*="error-message"]'
+      );
+      if (firstErrorElement) {
+        firstErrorElement.scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
       return;
     }
 
@@ -122,7 +279,33 @@ export default function CheckoutPage() {
     completeOrder(orderData);
   };
 
+  // Helper component for error messages
+  const ErrorMessage = ({ message }: { message?: string }) => {
+    if (!message) return null;
+
+    return (
+      <div className="flex items-center gap-1 text-sm text-destructive mt-1 error-message">
+        <AlertCircle className="h-3 w-3" />
+        <span>{message}</span>
+      </div>
+    );
+  };
+
+   
+
   return (
+    <>
+    {processingPayment && (
+      <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-black">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black dark:border-white mx-auto mb-4" />
+          <p className="text-lg font-medium">
+            Processing your payment…
+          </p>
+        </div>
+      </div>
+    )}
+    
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8 max-w-7xl">
         {/* Header */}
@@ -130,6 +313,7 @@ export default function CheckoutPage() {
           <Button
             variant="ghost"
             className="mb-4 p-0 h-auto text-muted-foreground hover:text-foreground"
+            onClick={() => router.back()}
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Cart
@@ -156,23 +340,41 @@ export default function CheckoutPage() {
               <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="firstName">First Name</Label>
+                    <Label htmlFor="firstName">First Name *</Label>
                     <Input
                       id="firstName"
                       placeholder="John"
                       onChange={HandleContactInformation}
                       name="FirstName"
                       value={UserContactInformation.FirstName}
+                      className={
+                        validationErrors.contact?.FirstName
+                          ? "border-destructive"
+                          : ""
+                      }
+                      required
+                    />
+                    <ErrorMessage
+                      message={validationErrors.contact?.FirstName}
                     />
                   </div>
                   <div>
-                    <Label htmlFor="lastName">Last Name</Label>
+                    <Label htmlFor="lastName">Last Name *</Label>
                     <Input
                       id="lastName"
                       placeholder="Doe"
                       onChange={HandleContactInformation}
                       name="LastName"
                       value={UserContactInformation.LastName}
+                      className={
+                        validationErrors.contact?.LastName
+                          ? "border-destructive"
+                          : ""
+                      }
+                      required
+                    />
+                    <ErrorMessage
+                      message={validationErrors.contact?.LastName}
                     />
                   </div>
                 </div>
@@ -191,7 +393,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Phone Number</Label>
+                  <Label htmlFor="phone">Phone Number *</Label>
                   <Input
                     id="phone"
                     type="tel"
@@ -199,7 +401,20 @@ export default function CheckoutPage() {
                     onChange={HandleContactInformation}
                     name="PhoneNumber"
                     value={UserContactInformation.PhoneNumber}
+                    className={
+                      validationErrors.contact?.PhoneNumber
+                        ? "border-destructive"
+                        : ""
+                    }
+                    required
                   />
+                  <ErrorMessage
+                    message={validationErrors.contact?.PhoneNumber}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Must be a valid Indian phone number (10 digits starting with
+                    6-9)
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -216,13 +431,22 @@ export default function CheckoutPage() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="streetAddress">Street Address</Label>
+                  <Label htmlFor="streetAddress">Street Address *</Label>
                   <Input
                     id="streetAddress"
                     name="StreetAddress"
                     placeholder="123 Main Street"
                     value={UserShippingAddress.StreetAddress}
                     onChange={HandleShippingAddress}
+                    className={
+                      validationErrors.shipping?.StreetAddress
+                        ? "border-destructive"
+                        : ""
+                    }
+                    required
+                  />
+                  <ErrorMessage
+                    message={validationErrors.shipping?.StreetAddress}
                   />
                 </div>
 
@@ -241,27 +465,35 @@ export default function CheckoutPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">City *</Label>
                     <Input
                       id="city"
                       name="City"
                       placeholder="New York"
                       value={UserShippingAddress.City}
                       onChange={HandleShippingAddress}
+                      className={
+                        validationErrors.shipping?.City
+                          ? "border-destructive"
+                          : ""
+                      }
+                      required
                     />
+                    <ErrorMessage message={validationErrors.shipping?.City} />
                   </div>
                   <div>
-                    <Label htmlFor="state">State</Label>
+                    <Label htmlFor="state">State *</Label>
                     <Select
                       value={UserShippingAddress.State}
-                      onValueChange={(val: any) =>
-                        setUserShippingAddress((prev) => ({
-                          ...prev,
-                          State: val,
-                        }))
-                      }
+                      onValueChange={handleStateChange}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger
+                        className={
+                          validationErrors.shipping?.State
+                            ? "border-destructive"
+                            : ""
+                        }
+                      >
                         <SelectValue placeholder="Select state" />
                       </SelectTrigger>
                       <SelectContent>
@@ -272,18 +504,29 @@ export default function CheckoutPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    <ErrorMessage message={validationErrors.shipping?.State} />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="zipCode">ZIP Code</Label>
+                  <Label htmlFor="zipCode">ZIP Code *</Label>
                   <Input
                     id="zipCode"
                     name="PinCode"
                     placeholder="10001"
                     value={UserShippingAddress.PinCode}
                     onChange={HandleShippingAddress}
+                    className={
+                      validationErrors.shipping?.PinCode
+                        ? "border-destructive"
+                        : ""
+                    }
+                    required
                   />
+                  <ErrorMessage message={validationErrors.shipping?.PinCode} />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    6-digit Indian PIN code
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -359,10 +602,6 @@ export default function CheckoutPage() {
                     </span>
                     <span>₹{shipping.toFixed(2)}</span>
                   </div>
-                  {/* <div className="flex justify-between text-sm">
-                    <span>Tax</span>
-                    <span>₹{tax.toFixed(2)}</span>
-                  </div> */}
                   <Separator />
                   <div className="flex justify-between font-semibold text-lg">
                     <span>Total</span>
@@ -370,16 +609,60 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
+                {/* Validation summary */}
+                {isFormTouched &&
+                  (validationErrors.contact || validationErrors.shipping) && (
+                    <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md">
+                      <p className="text-sm text-destructive font-medium mb-2">
+                        Please fix the following errors:
+                      </p>
+                      <ul className="text-sm text-destructive list-disc pl-4 space-y-1">
+                        {validationErrors.contact?.FirstName && (
+                          <li>
+                            First Name: {validationErrors.contact.FirstName}
+                          </li>
+                        )}
+                        {validationErrors.contact?.LastName && (
+                          <li>
+                            Last Name: {validationErrors.contact.LastName}
+                          </li>
+                        )}
+                        {validationErrors.contact?.PhoneNumber && (
+                          <li>
+                            Phone Number: {validationErrors.contact.PhoneNumber}
+                          </li>
+                        )}
+                        {validationErrors.shipping?.StreetAddress && (
+                          <li>
+                            Street Address:{" "}
+                            {validationErrors.shipping.StreetAddress}
+                          </li>
+                        )}
+                        {validationErrors.shipping?.City && (
+                          <li>City: {validationErrors.shipping.City}</li>
+                        )}
+                        {validationErrors.shipping?.State && (
+                          <li>State: {validationErrors.shipping.State}</li>
+                        )}
+                        {validationErrors.shipping?.PinCode && (
+                          <li>PIN Code: {validationErrors.shipping.PinCode}</li>
+                        )}
+                      </ul>
+                    </div>
+                  )}
+
                 {/* Complete Order Button */}
                 <Button
-                  className="w-full h-12 text-base font-semibold"
+                  className="w-full h-12 text-base font-semibold mt-2"
                   size="lg"
                   onClick={handleCompleteOrder}
-                  disabled={isPending}
+                  disabled={isPending || items.length === 0}
                 >
                   <Lock className="mr-2 h-4 w-4" />
                   {isPending
                     ? "Processing..."
+                    : items.length === 0
+                    ? "Cart is Empty"
                     : `Complete Order - ₹${subtotal.toFixed(2)}`}
                 </Button>
 
@@ -420,5 +703,6 @@ export default function CheckoutPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
