@@ -1,13 +1,18 @@
 import api from "@/services/api";
 import { Product } from "@/types/product";
 
-export const getProducts = async (): Promise<Product[]> => {
+export const getProducts = async (
+  limit?: number
+): Promise<Product[]> => {
   try {
-    const response = await api("/products/getallproducts"); 
-    return response.data.data; 
+    const response = await api.get("/products/getallproducts", {
+      params: limit ? { limit } : {},
+    });
+
+    return response.data.data;
   } catch (error: any) {
     console.error("Failed to fetch products:", error);
-    return [];  
+    return [];
   }
 }
 

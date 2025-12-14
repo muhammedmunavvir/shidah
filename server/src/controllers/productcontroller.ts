@@ -7,7 +7,18 @@ export const getProducts = async (
   res: Response
 ): Promise<void> => {
   try {
-    const products = await ProductModel.find();
+    const limit = req.query.limit
+      ? Number(req.query.limit)
+      : null;
+
+    let query = ProductModel.find().sort({ createdAt: -1 });
+
+    if (limit) {
+      query = query.limit(limit);
+    }
+
+    const products = await query;
+
     res.status(200).json({
       status: "success",
       message: "Products fetched successfully",
@@ -21,6 +32,7 @@ export const getProducts = async (
     });
   }
 };
+
 export const fetchsingleproduct = async (
   req: Request,
   res: Response
