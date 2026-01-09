@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LayoutDashboard, Users, Package, Settings, LogOut, Boxes, Menu } from "lucide-react";
+import { LayoutDashboard, Users, Package, LogOut, Boxes, Menu } from "lucide-react";
 import { useAuthStore } from "@/store/useAuthstore";
 import { useEffect, useState } from "react";
 import { useAuthInit } from "@/hooks/useAuthInit";
@@ -29,7 +29,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: "Users", icon: <Users size={18} />, href: "/admin/users" },
     { name: "Orders", icon: <Package size={18} />, href: "/admin/orders" },
     { name: "Products", icon: <Boxes size={18} />, href: "/admin/products" },
-    { name: "Settings", icon: <Settings size={18} />, href: "/admin/setting" },
   ];
 
   async function handleLogout() {

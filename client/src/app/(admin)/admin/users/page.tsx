@@ -25,7 +25,6 @@ function UserSkeleton() {
 export default function UserList() {
   const fetchAllUsers = async () => {
     const res = await GetAllUsers()
-    console.log("Users:", res.data)
     return res.data
   }
 
