@@ -132,7 +132,7 @@ export default function MobileHero() {
           </Link>
         </div>
 
-        {/* RIGHT IMAGE/VIDEO */}
+        {/* RIGHT    /VIDEO */}
         <div
           className="flex items-center justify-end pr-10"
           data-aos="fade-left"

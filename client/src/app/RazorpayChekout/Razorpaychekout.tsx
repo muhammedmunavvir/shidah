@@ -17,11 +17,13 @@ interface RazorpayOptions {
   };
 }
 
-export const openRazorpay = (options: RazorpayOptions,setProcessingPayment:any) => {
+export const openRazorpay = (
+  options: RazorpayOptions,
+  setProcessingPayment: any
+) => {
   //const router=useRouter()
   if (typeof window === "undefined") return;
-    setProcessingPayment(true);
-
+  setProcessingPayment(true);
 
   const razorpayOptions = {
     key: options.key,
@@ -43,7 +45,9 @@ export const openRazorpay = (options: RazorpayOptions,setProcessingPayment:any) 
 
         if (result.success) {
           toast.success("Payment verified successfully!");
-          window.location.replace("/order-summary");
+          window.location.replace(
+            `/order-summary?orderId=${options.dbOrderId}`
+          );
         } else {
           toast.error(" Payment verification failed");
         }

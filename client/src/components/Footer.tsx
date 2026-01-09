@@ -35,10 +35,10 @@ export const Footer = () => {
   const footerLinks = {
     company: [
       { name: "About Us", href: "/aboutpage" },
-      { name: "Our Story", href: "/our-story" },
-      { name: "Careers", href: "/careers" },
-      { name: "Press", href: "/press" },
-      { name: "Blog", href: "/blog" },
+      { name: "Our Story", href: "/comingSoon" },
+      { name: "Careers", href: "/comingSoon" },
+      { name: "Press", href: "/comingSoon" },
+      { name: "Blog", href: "/comingSoon" },
     ],
     products: [
       { name: "Categories", href: "/categories" },
@@ -51,15 +51,15 @@ export const Footer = () => {
       { name: "Help Center", href: "/help" },
       { name: "Contact Us", href: "/contact" },
       { name: "Shipping Info", href: "/shipping" },
-      { name: "Returns", href: "/returns" },
-      { name: "Size Guide", href: "/size-guide" },
+      { name: "Returns", href: "/comingSoon" },
+      { name: "Size Guide", href: "/comingSoon" },
     ],
     legal: [
-      { name: "Privacy Policy", href: "/privacy-policy" },
-      { name: "Terms of Service", href: "/terms" },
-      { name: "Cookie Policy", href: "/cookie-policy" },
-      { name: "GDPR", href: "/gdpr" },
-      { name: "Accessibility", href: "/accessibility" },
+      { name: "Privacy Policy", href: "/comingSoon" },
+      { name: "Terms of Service", href: "/comingSoon" },
+      { name: "Cookie Policy", href: "/comingSoon" },
+      { name: "GDPR", href: "/comingSoon" },
+      { name: "Accessibility", href: "/comingSoon" },
     ],
   };
 
@@ -216,7 +216,7 @@ export const Footer = () => {
           <div className="mt-12 md:mt-16 pt-6 md:pt-8 border-t border-black/10 dark:border-white/20">
             <div className="flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
               <div className="flex items-center gap-2 text-center sm:text-left">
-                <span>© 2024 Shidah</span>
+                <span>© 2026 Shidah</span>
                 <span className="hidden sm:inline">—</span>
                 <span className="flex items-center gap-1">
                   Made with

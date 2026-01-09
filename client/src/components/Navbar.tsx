@@ -48,15 +48,14 @@ export default function Navbar() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-const { items: wishlistItems, fetchWishlist } = useWishlistStore();
+  const { items: wishlistItems, fetchWishlist } = useWishlistStore();
 
-useEffect(() => {
-  if (user?._id) {
-    Getitem();        // cart
-    fetchWishlist(); // wishlist
-  }
-}, [user, Getitem, fetchWishlist]);
-
+  useEffect(() => {
+    if (user?._id) {
+      Getitem(); // cart
+      fetchWishlist(); // wishlist
+    }
+  }, [user, Getitem, fetchWishlist]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -77,7 +76,7 @@ useEffect(() => {
   const navigationItems = [
     { name: "Products", href: "/allproducts" },
     { name: "Categories", href: "#" },
-    { name: "Deals", href: "#" },
+    // { name: "Deals", href: "#" },
     { name: "About", href: "/aboutpage" },
     { name: "Contact", href: "#" },
   ];
@@ -115,27 +114,6 @@ useEffect(() => {
           }`}
         >
           {/* Logo */}
-          {/* <div className="flex items-center space-x-3 flex-shrink-0">
-              <Link href="/" className="flex items-center space-x-2">
-                {/* image container must be relative for next/image fill 
-                <div
-                  className={`relative overflow-hidden rounded-md flex items-center justify-center
-                    ${isScrolled ? "h-6 w-6" : "h-8 w-8"}
-                  `}
-                  aria-hidden={false}
-                >
-                  <img
-                    src="https://res.cloudinary.com/dwypehszo/image/upload/v1764398757/Group_1_qnswwg.jpg"
-                    alt="Shidah logo"
-                    sizes={isScrolled ? "24px" : "32px"}
-                    className="object-contain"
-                    
-                  />
-                </div>
-
-              </Link>
-            </div> */}
-
           <div className="flex items-center space-x-2 flex-shrink-0">
             <Link href="/" className="flex items-center">
               <div
@@ -149,17 +127,22 @@ useEffect(() => {
           {/* Desktop Navigation */}
           <div
             className={`
-                hidden md:flex items-center absolute left-1/2 transform -translate-x-1/2
+                hidden md:flex items-center
+                ${
+                  isScrolled
+                    ? "absolute left-1/2 transform -translate-x-1/2 w-auto max-w-[280px]"
+                    : "flex-1 justify-center"
+                }
                 ${isScrolled ? "scale-90" : "scale-100"}
               `}
           >
-            <div className="flex items-center space-x-6">
+            <div className={`flex items-center ${isScrolled ? "space-x-4" : "space-x-6"}`}>
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={`
-                      font-medium text-black-500 relative group
+                      font-medium text-black-500 relative group whitespace-nowrap
                       ${isScrolled ? "text-xs" : "text-sm"}
                     `}
                 >
@@ -177,6 +160,9 @@ useEffect(() => {
               variant="ghost"
               size="icon"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className={`${
+                isScrolled ? "h-8 w-8" : "h-10 w-10"
+              } hover:bg-white/10`}
             >
               {theme === "dark" ? (
                 <Sun className="h-5 w-5 text-yellow-400" />
@@ -216,13 +202,6 @@ useEffect(() => {
                   </Button>
                 )}
               </div>
-            )}
-
-            {/* Mobile Search */}
-            {!isScrolled && (
-              <Button variant="ghost" size="icon" className="hidden">
-                <Search className="h-5 w-5" />
-              </Button>
             )}
 
             {/* Cart */}
@@ -359,33 +338,21 @@ useEffect(() => {
                 side="right"
                 className="
                   pointer-events-auto
-
                   w-80 p-6 h-full overflow-y-auto tracking-wide
-                bg-white/20 dark:bg-white/10 
+                  bg-white/20 dark:bg-white/10 
                   backdrop-blur-xl
                   border border-white/20 dark:border-white/10
-                shadow-[0_8px_32px_rgba(0,0,0,0.2)]
-              rounded-2xl
-  "
+                  shadow-[0_8px_32px_rgba(0,0,0,0.2)]
+                  rounded-2xl
+                "
               >
-                {/* Logo */}
-                {/* <div className="flex items-center space-x-2 flex-shrink-0">
-                    <Link href="/" className="flex items-center">
-                      <div
-                        className={`${playwrite.className} text-xl font-semibold dark:text-white text-black`}
-                      >
-                        Shidah<span className="italic ml-1">.in</span>
-                      </div>
-                    </Link>
-                  </div> */}
-
                 {/* Navigation Items */}
                 <nav className="flex flex-col space-y-4">
                   {navigationItems.map((item) => (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className="text-base font-medium text-white-400  "
+                      className="text-base font-medium text-white-400"
                     >
                       {item.name}
                     </Link>
