@@ -1,5 +1,5 @@
 "use client";
-
+export const dynamic = "force-dynamic";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuthStore } from "@/store/useAuthstore";
 import { BarChart3, Package, Users, IndianRupee, ArrowUpRight } from "lucide-react";
@@ -20,7 +20,6 @@ export default function DashboardPage() {
 
   const router = useRouter();
   const { user ,hydrated} = useAuthStore();
-  console.log(user?.role,"user .role in admin page.tsx")
 useEffect(() => {
   if (!hydrated) return;
 
